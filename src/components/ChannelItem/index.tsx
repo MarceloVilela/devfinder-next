@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ChannelData } from '../../pages/ChannelDetail'
+import { ChannelData } from '../../pages/channel/[slug]';
 import { ChannelThumb } from './style';
 
 interface ItemProps {

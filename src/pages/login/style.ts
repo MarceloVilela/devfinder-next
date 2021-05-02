@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const LoginContainer = styled.div`
+const LoginContainer = styled.div`
 & {
     height: 100%;
     display: flex;
@@ -62,3 +62,5 @@ form .login-visitor {
 form .login-social-github {
     background-color: #28a745;
 }`;
+
+export default LoginContainer;

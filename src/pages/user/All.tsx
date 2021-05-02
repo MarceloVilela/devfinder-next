@@ -6,7 +6,7 @@ import api from '../../services/api'
 import { delay } from '../../utils'
 import { useAuth, UserData } from '../../hooks/auth'
 import { Container, UserItem, Paginate } from '../../components'
-import { UsersList } from './style'
+import UsersList from './style'
 
 export interface UserAllProps {
   docsStatic: UserData[];

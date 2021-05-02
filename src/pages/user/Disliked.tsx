@@ -5,7 +5,7 @@ import { MdSyncDisabled } from 'react-icons/md'
 import api from '../../services/api'
 import { useAuth, UserData } from '../../hooks/auth'
 import { Container, UserItem } from '../../components'
-import { UsersList } from './style'
+import UsersList from './style'
 
 function Disliked() {
   const { user } = useAuth();

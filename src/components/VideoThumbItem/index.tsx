@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { VideoData } from '../../pages/Main'
+import { VideoData } from '../../pages/video/index';
 import { Thumb } from './style';
 
 interface ItemProps {

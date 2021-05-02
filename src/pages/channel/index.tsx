@@ -8,7 +8,7 @@ import api from '../../services/api'
 import { useAuth } from '../../hooks/auth';
 import { Header, Container, Footer, ChannelItem } from '../../components'
 import { ChannelData } from './[slug]'
-import { ChannelContainer } from './style';
+import ChannelContainer from './style';
 import { delay } from '../../utils';
 
 interface ChannelsGroupedByCategory {

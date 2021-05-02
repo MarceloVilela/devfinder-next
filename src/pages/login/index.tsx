@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
-import { LoginContainer } from './style'
+import LoginContainer from './style'
 
 interface LoginProps {
   history: {

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Container } from '../../components'
 
-export const ContainerFullWidth = styled(Container)`
+const ContainerFullWidth = styled(Container)`
   @media screen and (max-width: 1024px) {
     & {
       width: 100%;
@@ -62,3 +62,5 @@ export const VideoList = styled.ul`
     }
   }
 `;
+
+export default ContainerFullWidth;

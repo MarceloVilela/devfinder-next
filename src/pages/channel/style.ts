@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const ChannelContainer = styled.div`
+const ChannelContainer = styled.div`
 
 .empty {
   font-size: 32px;
@@ -146,3 +146,5 @@ select {
   }
 }
 `;
+
+export default ChannelContainer;

@@ -8,7 +8,7 @@ import { TrendProps } from './Trend';
 import { Footer, Header } from '../../components'
 import Subs from './Subs';
 import Trend from './Trend';
-import { ContainerFullWidth } from './style'
+import ContainerFullWidth from './style'
 
 export interface VideoData {
   _id: string;
