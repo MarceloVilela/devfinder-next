@@ -53,6 +53,7 @@ export const VideoList = styled.ul`
     & {
       grid-template-columns: repeat(2, 1fr);
       margin: 0 16px;
+      margin: 0;
     }
   }
 

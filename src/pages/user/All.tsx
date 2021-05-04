@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import { MdSyncDisabled, MdStarBorder } from 'react-icons/md'
 
 import api from '../../services/api'
-import { delay } from '../../utils'
+//import { delay } from '../../utils'
 import { useAuth, UserData } from '../../hooks/auth'
 import { Container, UserItem, Paginate } from '../../components'
 import UsersList from './style'
@@ -37,7 +37,7 @@ function All({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) {
           setDocs(Array.from(Array(50)).map(item => ({} as UserData)))
         }
 
-        await delay(10 * 60 * 1000);
+        //await delay(10 * 60 * 1000);
 
         const { data } = await api.get('/devs', { params: { page } })
         setDocs(data.docs)

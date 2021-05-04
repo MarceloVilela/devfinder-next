@@ -14,8 +14,6 @@ export async function getStaticProps() {
   const { data } = await api.get('/feed/trending', { params: { page: 1 } })
   const { docs, total, itemsPerPage } = data;
 
-  console.log('getStaticProps', docs.length);
-
   return {
     props: {
       docsStatic: docs,

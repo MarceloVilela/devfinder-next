@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "@next/env": "^10.2.0",
+    "@types/react-select": "^4.0.15",
     "axios": "^0.21.1",
     "next": "10.2.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "^4.2.0",
+    "react-select": "^4.3.0",
     "react-tabs": "^3.2.2",
     "react-toastify": "^7.0.4",
     "styled-components": "^5.2.3"

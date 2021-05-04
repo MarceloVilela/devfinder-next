@@ -49,8 +49,6 @@ export async function getStaticProps() {
   const { data } = await api.get('/devs', { params: { page: 1 } })
   const { docs, total, itemsPerPage } = data;
 
-  //console.log('getStaticProps', docs);
-
   return {
     props: {
       docsStatic: docs,

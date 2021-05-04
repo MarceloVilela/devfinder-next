@@ -15,6 +15,7 @@ section {
   max-width: 980px;
   margin: 0 auto;
   padding: 24px 0 0 0;
+  padding: 8px 0;
   text-align: center;
   display: flex;
   align-content: space-between;
@@ -30,6 +31,31 @@ section {
 section>a {
   display: flex;
   flex: 5;
+}
+
+nav a {
+  position: relative;
+}
+
+nav a > div {
+  position: absolute;
+  width: 300px;
+  right: 0;
+  top: 40px;
+}
+
+nav a div {
+  background-color: ${props => props.theme.background};
+  color: ${props => props.theme.primary};
+  outline-color: ${props => props.theme.primary};
+  border-color: ${props => props.theme.primary};
+
+  text-align: left;
+
+  &:hover {
+    outline-color: ${props => props.theme.primary};
+    border-color: ${props => props.theme.primary};
+  }
 }
 
 section nav {

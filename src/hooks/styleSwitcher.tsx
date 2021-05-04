@@ -35,8 +35,7 @@ const StyleSwitcherProvider: React.FC<StyleSwitcherProps> = ({ children }) => {
         if (isServer) return;
 
         const alias = data.alias === 'dark' ? 'light' : 'dark';
-        console.log(`switchAlias: ${alias}`);
-
+        
         setData({
             alias,
         });

@@ -5,7 +5,7 @@ import api from '../../services/api'
 import { Paginate, VideoThumbItem, Container } from '../../components'
 import { VideoData } from './index'
 import { VideoList } from './style'
-import { delay } from '../../utils'
+//import { delay } from '../../utils'
 
 export interface TrendProps {
   docsStatic: VideoData[];
@@ -34,7 +34,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
           setDocs(Array.from(Array(30)).map(item => ({} as VideoData)))
         }
 
-        await delay(60 * 1000);
+        //await delay(5 * 60 * 1000);
 
         const { data } = await api.get('/feed/trending', { params: { page } })
         setDocs(data.docs)
@@ -48,8 +48,6 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
     }
     loadDocs()
   }, [page])
-
-  console.log('render', docs);
 
   return (
     <Container loading={false} unstylized className='container-full-width'>

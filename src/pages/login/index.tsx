@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 
@@ -7,13 +8,7 @@ import { useAuth } from '../../hooks/auth';
 import api from '../../services/api';
 import LoginContainer from './style'
 
-interface LoginProps {
-  history: {
-    push(route: string): void;
-  }
-}
-
-const Login: React.FC<LoginProps> = ({ history }) => {
+const Login: React.FC = () => {
   const router = useRouter();
   const { user, socialAuthCallback, signOut, message } = useAuth();
 
@@ -39,7 +34,6 @@ const Login: React.FC<LoginProps> = ({ history }) => {
   useEffect(() => {
     const { token } = router.query;
 
-    console.log('token', token);
     if (typeof token === 'string') {
       loadProfile(token);
     }
@@ -48,12 +42,10 @@ const Login: React.FC<LoginProps> = ({ history }) => {
   useEffect(() => {
     const { logout } = router.query;
 
-    console.log('logout', logout);
     if (logout) {
       return;
     }
 
-    console.log('user', user);
     if (user && Object.keys(user).includes('_id')) {
       router.push('/');
     }
@@ -67,8 +59,9 @@ const Login: React.FC<LoginProps> = ({ history }) => {
 
   return (
     <LoginContainer>
+      <Head><title>Login | {process.env.NEXT_PUBLIC_TITLE}</title></Head>
       <form>
-        <h1 className="logo">{process.env.REACT_APP_TITLE}</h1>
+        <h1 className="logo">{process.env.NEXT_PUBLIC_TITLE}</h1>
 
         <Link href='/'><a className="login-visitor">Acessar como visitante</a></Link>
 

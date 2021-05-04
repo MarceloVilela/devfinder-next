@@ -12,7 +12,7 @@ api.interceptors.response.use(function (response) {
     if (401 === error.response.status) {
         if (!isServer() && window.location.href.split('/').pop() !== 'login') {
             toast.error('Sessão expirada. Retornando para login.');
-            //window.location.href = '/login';
+            window.location.href = '/login';
         }
     } else {
         return Promise.reject(error);
