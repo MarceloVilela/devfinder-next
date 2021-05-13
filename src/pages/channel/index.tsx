@@ -9,7 +9,7 @@ import { useAuth } from '../../hooks/auth';
 import { Header, Container, Footer, ChannelItem } from '../../components'
 import { ChannelData } from './[slug]'
 import ChannelContainer from './style';
-//import { delay } from '../../utils';
+import { delay } from '../../utils';
 
 interface ChannelsGroupedByCategory {
   [key: string]: ChannelData[];
@@ -40,7 +40,7 @@ export default function Channel({ channelsStatic }: ChannelProps) {
         //setloading(true)
         //setChannels(Array.from(Array(50))?.map(item => ({} as ChannelData)));
 
-        //await delay(60 * 1000);
+        await delay(5 * 60 * 1000);
 
         const response = await api.get('/channels')
         setChannels(response.data)

@@ -19,18 +19,23 @@ section {
   text-align: center;
   display: flex;
   align-content: space-between;
+
+  flex-wrap: wrap;
 }
 
-@media (max-width: 1024px) {
-  section {
-    padding: 22px 22px 0 22px;
-    padding: 1rem 1rem 1rem 1rem;
-  }
-}
-
-section>a {
+section > a {
   display: flex;
-  flex: 5;
+  /*flex: 1;*/
+}
+
+section > div {
+  display: flex;
+  flex: 2;
+  margin: 0 16px 0 32px;
+}
+
+section > div > div {
+  flex: 1;
 }
 
 nav a {
@@ -82,6 +87,41 @@ section nav svg {
   text-align: center;
 
   color: ${props => props.theme.primary};
-}`;
+}
+
+@media (max-width: 1024px) {
+  section {
+    padding: 22px 22px 0 22px;
+    padding: 1rem 1rem 1rem 1rem;
+  }
+
+  section > a {
+    order: 1;
+    flex: 1;
+  }
+
+  section > div {
+    order: 3;
+    min-width: 100%;
+    width: 100%;
+    margin: 8px 0 0 0;
+  }
+
+  section > nav {
+    order: 2;
+    flex: 2;
+  }
+
+  section > nav a {
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+  }
+
+  section > nav a span {
+    margin-top: -4px;
+  }
+}
+`;
 
 export default Wrapper;

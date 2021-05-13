@@ -26,7 +26,7 @@ const ContainerWrapper = styled.main`
     width: 100%;
     padding: 32px 16px;
     /* header fixed */
-    padding-top: 80px;
+    padding-top: 120px;
   }
 
   &.container-full-width { 

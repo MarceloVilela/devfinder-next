@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router';
-import { FaYoutube, FaGithub, FaHome, FaSearch } from 'react-icons/fa';
+import {
+  FaYoutube,
+  FaGithub,
+  FaHome,
+  FaSearch,
+  // FaSignOutAlt, 
+  FaUserCircle
+} from 'react-icons/fa';
 import AsyncSelect from 'react-select/async';
 
 import Wrapper from './style'
@@ -45,6 +52,18 @@ export default function Header() {
           </a>
         </Link>
 
+        <AsyncSelect
+          value={selectedValue}
+          getOptionLabel={e => e.label}
+          getOptionValue={e => e.value}
+          loadOptions={loadOptions}
+          onInputChange={handleInputChange}
+          onChange={handleChange}
+          placeholder='Buscar'
+          noOptionsMessage={() => 'Nada encontrado'}
+          onBlur={() => setIsVisible(false)}
+        />
+
         <nav>
           <Link href={`/`}>
             <a>
@@ -67,32 +86,13 @@ export default function Header() {
             </a>
           </Link>
 
-          <a href='#' onClick={() => setIsVisible(true)}>
-            <FaSearch />
-            <span>Buscar</span>
-            {isVisible &&
-              <AsyncSelect
-                value={selectedValue}
-                getOptionLabel={e => e.label}
-                getOptionValue={e => e.value}
-                loadOptions={loadOptions}
-                onInputChange={handleInputChange}
-                onChange={handleChange}
-                placeholder='Buscar'
-                noOptionsMessage={() => 'Nada encontrado'}
-                onBlur={() => setIsVisible(false)}
-              />
-            }
-          </a>
-
-          {/*
           <Link href={`/login?logout=1`}>
             <a>
-              <FaSignOutAlt />
-              <span>Sair</span>
+              <FaUserCircle />
+              <span>Conta</span>
             </a>
           </Link>
-          */}
+
         </nav >
       </section >
     </Wrapper >

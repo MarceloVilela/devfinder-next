@@ -9,7 +9,7 @@ const api = axios.create({
 api.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
-    if (401 === error.response.status) {
+    if (error.response && 401 === error.response.status) {
         if (!isServer() && window.location.href.split('/').pop() !== 'login') {
             toast.error('Sessão expirada. Retornando para login.');
             window.location.href = '/login';

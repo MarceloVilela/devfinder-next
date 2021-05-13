@@ -1,3 +1,5 @@
+import { resetIdCounter } from 'react-tabs';
+
 import api from '../services/api';
 import Main from './video';
 import { TrendProps } from './video/Trend'
@@ -11,6 +13,8 @@ export default function HomePage({ docsStatic, totalStatic, itemsPerPageStatic }
 };
 
 export async function getStaticProps() {
+  resetIdCounter();
+
   const { data } = await api.get('/feed/trending', { params: { page: 1 } })
   const { docs, total, itemsPerPage } = data;
 

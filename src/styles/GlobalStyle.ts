@@ -68,6 +68,8 @@ main {
 .wrap-tabs-inline .react-tabs__tab-list {
   display: flex;
   border: 0;
+
+  list-style: none;
 }
 
 .wrap-tabs-inline .react-tabs__tab {
@@ -75,6 +77,9 @@ main {
   color: ${props => props.theme.primaryStronger};
   border-radius: 0;
   border: 0;
+
+  padding: 6px 12px;
+  cursor: pointer;
 }
 
 .wrap-tabs-inline .react-tabs__tab--selected {

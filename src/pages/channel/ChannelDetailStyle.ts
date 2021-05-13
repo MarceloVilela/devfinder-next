@@ -8,6 +8,7 @@ const About = styled.ul`
 
 li {
   display: flex;
+  flex-direction: column;
   padding: 16px;
 }
 
