@@ -7,8 +7,10 @@ import { toast } from 'react-toastify';
 
 import api from '../../services/api'
 import { useAuth } from '../../hooks/auth';
-import { Header, Container, Footer } from '../../components'
+import { Header, Container, Footer, VideoThumbItem, Paginate } from '../../components'
+import { VideoData } from '../video'
 import About from './ChannelDetailStyle'
+import { VideoList } from '../video/style';
 
 export interface ChannelData {
   tags: string[];
@@ -39,6 +41,11 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
 
   const [channel, setchannel] = useState<ChannelData>({} as ChannelData)
   const [loading, setLoading] = useState(false)
+  // videosByChannel
+  const [docs, setDocs] = useState<VideoData[]>([] as VideoData[])
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(0);
 
   useEffect(() => {
     async function loadchannels() {
@@ -51,14 +58,19 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
       try {
         setLoading(true)
 
-        const { data } = await api.get<ChannelData>(`/channels/${search_query}`)
-
+        const { data } = await api.get<ChannelData>(`/channels/${search_query}`);
         if (!data) {
           toast.error(`Ops! canal ${search_query} não encontrado.`);
           router.push('/channel');
         }
+        setchannel(data);
 
-        setchannel(data)
+        //
+
+        const { data: videoData } = await api.get('/feed/channel', { params: { channel_name: data.name } });
+        setDocs(videoData.docs);
+        setTotal(videoData.total);
+        setItemsPerPage(videoData.itemsPerPage);
       } catch (error) {
         toast.error(`Erro ao listar detalhes do canal: ${search_query}`)
       } finally {
@@ -68,6 +80,30 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
     }
     loadchannels()
   }, [router])
+
+  useEffect(() => {
+    async function loadDocs() {
+      try {
+        if (page !== 1) {
+          setLoading(true)
+          setDocs(Array.from(Array(30)).map(item => ({} as VideoData)))
+        } else {
+          return;
+        }
+
+        const { data } = await api.get('/feed/channel', { params: { channel_name: channel.name, page } })
+
+        setDocs(data.docs)
+        setTotal(data.total);
+        setItemsPerPage(data.itemsPerPage);
+      } catch (error) {
+        toast.error('Erro ao listar vídeos do canal')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadDocs()
+  }, [page])
 
   const includedInLike = useMemo(() => {
     if (!user) {
@@ -224,6 +260,15 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
                   </aside>
                 </li>
               </About>
+
+              <VideoList className="subs list-flex-column">
+                {docs?.map((item, key) => (
+                  <VideoThumbItem key={key} video={item} placeholder={loading} />
+                ))}
+              </VideoList>
+              {!loading &&
+                <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} handlePaginate={setPage} />
+              }
             </>
           )
         }

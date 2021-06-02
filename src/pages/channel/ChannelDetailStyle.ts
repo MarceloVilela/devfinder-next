@@ -4,6 +4,7 @@ const About = styled.ul`
   background-color: ${props => props.theme.backgroundWeakerer};
   border: 1px solid ${props => props.theme.backgroundWeakerer};
   border-radius: 15px;
+  margin-bottom: 48px;
 
 
 li {
