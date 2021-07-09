@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/router'
 
 import api from '../../services/api'
 import { Paginate, VideoThumbItem, Container } from '../../components'
@@ -19,6 +20,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     setDocs(docsStatic);
@@ -34,9 +36,9 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
           setDocs(Array.from(Array(30)).map(item => ({} as VideoData)))
         }
 
-        //await delay(5 * 60 * 1000);
+        const userIdentifier = router.query.user ? { user: router.query.user } : {};
 
-        const { data } = await api.get('/feed/trending', { params: { page } })
+        const { data } = await api.get('/feed/trending', { params: { page, ...userIdentifier } })
         setDocs(data.docs)
         setTotal(data.total);
         setItemsPerPage(data.itemsPerPage);
@@ -47,7 +49,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
       }
     }
     loadDocs()
-  }, [page])
+  }, [page, router])
 
   return (
     <Container loading={false} unstylized className='container-full-width'>
