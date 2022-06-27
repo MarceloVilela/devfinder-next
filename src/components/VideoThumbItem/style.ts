@@ -15,6 +15,7 @@ export const Thumb = styled.li`
 
 .thumb img {
   width: 100%;
+  aspect-ratio: 16/9;
 }
 
 footer {
