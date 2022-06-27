@@ -54,7 +54,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (token && user) {
             const userParsed = JSON.parse(user);
-            api.defaults.headers.authorization = `Bearer ${token}`;
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
             return { token, user: userParsed };
         }
@@ -71,10 +71,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setData({} as AuthData);
     }, [])
 
-    const socialAuthCallback = useCallback(({ token, user }) => {
+    const socialAuthCallback = useCallback(({ token, user }: {token: string, user: UserData}) => {
         if (isServer()) return;
         
-        api.defaults.headers.authorization = `Bearer ${token}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         localStorage.setItem('@DevFinder:token', token);
         localStorage.setItem('@DevFinder:user', JSON.stringify(user));

@@ -27,7 +27,7 @@ function All({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) {
     setDocs(docsStatic);
     setTotal(totalStatic);
     setItemsPerPage(itemsPerPageStatic);
-  }, [])
+  }, [docsStatic, itemsPerPageStatic, totalStatic])
 
   useEffect(() => {
     async function loaddocs() {

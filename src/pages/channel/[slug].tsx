@@ -103,7 +103,7 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
       }
     }
     loadDocs()
-  }, [page])
+  }, [channel.name, page])
 
   const includedInLike = useMemo(() => {
     if (!user) {

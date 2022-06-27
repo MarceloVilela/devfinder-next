@@ -1,9 +1,15 @@
+import { ReactNode } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import AppProvider from '../hooks';
 
-function MyApp({ Component, pageProps }) {
+interface AppProps {
+  Component: any;
+  pageProps: any;
+}
+
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <AppProvider>

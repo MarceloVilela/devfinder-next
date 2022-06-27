@@ -64,7 +64,7 @@ const VideoDetail: React.FC<VideoDetailProps> = ({ match }) => {
             <img
               className="thumb"
               src={video.thumbnail}
-              alt={video.title}
+              alt={video.title}       
             />
 
             <p>{video.title}</p>

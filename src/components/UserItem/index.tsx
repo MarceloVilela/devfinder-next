@@ -1,11 +1,10 @@
-import React from 'react';
-
 import { UserData } from '../../hooks/auth'
 import { UserThumb } from './style';
 
 interface UserItemProps {
   user: UserData;
   placeholder: boolean;
+  children?: React.ReactNode;
 }
 
 const UserItem: React.FC<UserItemProps> = ({ user, placeholder, children }) => {
@@ -20,7 +19,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, placeholder, children }) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img src={user.avatar} alt={user.name} />
+                <img src={user.avatar} alt={user.name}  />
               </a>
             </div>
 

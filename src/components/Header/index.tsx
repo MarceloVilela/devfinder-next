@@ -10,39 +10,53 @@ import {
   // FaSignOutAlt, 
   FaUserCircle
 } from 'react-icons/fa';
+import { ActionMeta, GetOptionLabel, SingleValue } from 'react-select';
 const AsyncSelect = dynamic(() => import("react-select/async"), { ssr: false, });
 //mport AsyncSelect from 'react-select/async';
 
 import Wrapper from './style'
 import api from '../../services/api';
 
+type Option = {
+  value: string;
+  label: string;
+  type: string;
+}
+
 export default function Header() {
   const router = useRouter();
 
   const [inputValue, setValue] = useState('');
-  const [selectedValue, setSelectedValue] = useState(null);
+  const [selectedValue, setSelectedValue] = useState<Option>({} as Option);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => { setIsVisible(false) }, [])
 
   // handle input change event
-  const handleInputChange = value => {
+  const handleInputChange = (value: string) => {
     setValue(value);
   };
 
+  const getLabel = (option: Option) => option.label
+
+  const getValue = (option: Option) => {
+    return option.value;
+  }
+
   // handle selection
-  const handleChange = ({ value, label }) => {
+  const handleChange = (newValue: unknown, actionMeta: ActionMeta<unknown>) => {
+    const { value } = newValue as Option;
     router.push(value);
   }
 
   // load options using API call
-  const loadOptions = (inputValue) => {
-    const formatOption = ({ value, label, type }) => type === 'channel'
+  const loadOptions = (inputValue: string): Promise<Option[]> => {
+    const formatOption = ({ value, label, type }: Option) => type === 'channel'
       ? { value: `/channel/${value}`, label }
       : { value: `/video/${value}`, label }
 
     return api.get('/search', { params: { q: inputValue } })
-      .then(({ data }) => data.map(({ value, label, type }) => formatOption({ value, label, type })));
+      .then(({ data }) => data.map(({ value, label, type }: Option) => formatOption({ value, label, type })));
   };
 
   return (
@@ -55,9 +69,6 @@ export default function Header() {
         </Link>
 
         <AsyncSelect
-          value={selectedValue}
-          getOptionLabel={e => e.label}
-          getOptionValue={e => e.value}
           loadOptions={loadOptions}
           onInputChange={handleInputChange}
           onChange={handleChange}

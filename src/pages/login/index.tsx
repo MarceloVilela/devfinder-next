@@ -14,7 +14,7 @@ const Login: React.FC = () => {
 
   const loadProfile = useCallback(async function (token: string) {
     try {
-      api.defaults.headers.authorization = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const config = {
         headers: { authorization: `Bearer ${token}` }
       };
@@ -22,8 +22,10 @@ const Login: React.FC = () => {
       const { data: user } = await api.get('/me', config);
 
       socialAuthCallback({ token, user });
-    } catch (error) {
-      toast.error(`Erro ao listar perfil - ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(`Erro ao listar perfil - ${error.message}`);
+      }
     }
   }, [socialAuthCallback]);
 

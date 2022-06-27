@@ -17,7 +17,7 @@ const Container: React.FC<ContainerProps> = ({ children, loading, className, uns
           <article className='loading-wrapper'>
             <img
               src="/load.gif"
-              alt="Loading"
+              alt="Loading"              
             />
           </article>
         )

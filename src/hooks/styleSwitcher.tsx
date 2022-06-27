@@ -18,7 +18,7 @@ const StyleSwitcherContext = createContext<StyleSwitcherContextData>({} as Style
 
 const StyleSwitcherProvider: React.FC<StyleSwitcherProps> = ({ children }) => {
     const [data, setData] = useState<StyleData>(() => {
-        if (isServer) {
+        if (isServer()) {
             return { alias: 'dark' };
         }
 
@@ -32,7 +32,7 @@ const StyleSwitcherProvider: React.FC<StyleSwitcherProps> = ({ children }) => {
     });
 
     const switchAlias = useCallback(() => {
-        if (isServer) return;
+        if (isServer()) return;
 
         const alias = data.alias === 'dark' ? 'light' : 'dark';
         

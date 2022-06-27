@@ -26,7 +26,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
     setDocs(docsStatic);
     setTotal(totalStatic);
     setItemsPerPage(itemsPerPageStatic);
-  }, [])
+  }, [docsStatic, itemsPerPageStatic, totalStatic])
 
   useEffect(() => {
     async function loadDocs() {
