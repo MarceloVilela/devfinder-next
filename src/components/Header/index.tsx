@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router';
 import {
   FaYoutube,
@@ -9,7 +10,8 @@ import {
   // FaSignOutAlt, 
   FaUserCircle
 } from 'react-icons/fa';
-import AsyncSelect from 'react-select/async';
+const AsyncSelect = dynamic(() => import("react-select/async"), { ssr: false, });
+//mport AsyncSelect from 'react-select/async';
 
 import Wrapper from './style'
 import api from '../../services/api';
