@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
-import { Tab, Tabs, TabList, TabPanel, resetIdCounter } from 'react-tabs';
+import { Tab, Tabs, TabList, TabPanel /*, resetIdCounter*/ } from 'react-tabs';
 
 import { useAuth } from '../../hooks/auth'
 import api from '../../services/api';
@@ -65,7 +65,7 @@ export default function UserListPage({ docsStatic, totalStatic, itemsPerPageStat
 }
 
 export async function getStaticProps() {
-  resetIdCounter();
+  //resetIdCounter();
 
   const { data } = await api.get('/devs', { params: { page: 1 } })
   console.log('getStaticProps', data.total);
