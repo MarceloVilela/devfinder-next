@@ -16,7 +16,7 @@ const Login: React.FC = () => {
     try {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const config = {
-        headers: { authorization: `Bearer ${token}` }
+        // headers: { authorization: `Bearer ${token}` }
       };
 
       const { data: user } = await api.get('/me', config);
