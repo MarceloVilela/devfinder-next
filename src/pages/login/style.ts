@@ -56,7 +56,7 @@ form a {
 }
 
 form .login-visitor {
-    background-color: #007bff;
+    background-color: inherit;
 }
 
 form .login-social-github {

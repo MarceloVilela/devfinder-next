@@ -65,7 +65,7 @@ const Login: React.FC = () => {
       <form>
         <h1 className="logo">{process.env.NEXT_PUBLIC_TITLE}</h1>
 
-        <Link href='/'><a className="login-visitor">Acessar como visitante</a></Link>
+        <Link href='/'><span className="login-visitor">Acessar como visitante</span></Link>
 
         <a href={process.env.NEXT_PUBLIC_API_URL + '/auth/github'} className="login-social-github">Acessar com Github</a>
       </form>

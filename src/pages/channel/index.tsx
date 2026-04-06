@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, Fragment } from 'react'
 import Head from 'next/head';
 import { toast } from 'react-toastify';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+// @ts-ignore
 import 'react-tabs/style/react-tabs.css';
 
 import api from '../../services/api'

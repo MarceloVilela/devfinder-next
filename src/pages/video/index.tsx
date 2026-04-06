@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+// @ts-ignore
 import 'react-tabs/style/react-tabs.css';
 
 import { useAuth } from '../../hooks/auth';

@@ -63,9 +63,7 @@ export default function Header() {
     <Wrapper>
       <section>
         <Link href={`/`}>
-          <a>
             <h1 className="logo">{process.env.NEXT_PUBLIC_TITLE}</h1>
-          </a>
         </Link>
 
         <AsyncSelect
@@ -79,31 +77,23 @@ export default function Header() {
 
         <nav>
           <Link href={`/`}>
-            <a>
               <FaHome />
               <span>Home</span>
-            </a>
           </Link>
 
           <Link href={`/user`}>
-            <a>
               <FaGithub />
               <span>Usuários</span>
-            </a>
           </Link>
 
           <Link href={`/channel`}>
-            <a>
               <FaYoutube />
               <span>Canais</span>
-            </a>
           </Link>
 
           <Link href={`/login?logout=1`}>
-            <a>
               <FaUserCircle />
               <span>Conta</span>
-            </a>
           </Link>
 
         </nav >

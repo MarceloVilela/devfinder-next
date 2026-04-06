@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { ToastContainer } from 'react-toastify';
+// @ts-ignore
 import 'react-toastify/dist/ReactToastify.css';
 
 import AppProvider from '../hooks';
