@@ -10,7 +10,7 @@ import LoginContainer from './style'
 
 const Login: React.FC = () => {
   const router = useRouter();
-  const { user, socialAuthCallback, signOut, message } = useAuth();
+  const { user, socialAuthCallback, signOut, message, isHydrated } = useAuth();
 
   const loadProfile = useCallback(async function (token: string) {
     try {
@@ -48,10 +48,10 @@ const Login: React.FC = () => {
       return;
     }
 
-    if (user && Object.keys(user).includes('_id')) {
+    if (isHydrated && user && Object.keys(user).includes('_id')) {
       router.push('/');
     }
-  }, [user, router])
+  }, [user, router, isHydrated])
 
   useEffect(() => {
     if (message) {

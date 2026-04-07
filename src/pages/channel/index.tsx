@@ -25,7 +25,7 @@ interface ChannelProps {
 }
 
 export default function Channel({ channelsStatic }: ChannelProps) {
-  const { user } = useAuth();
+  const { user, isHydrated } = useAuth();
 
   const [tabIndex, setTabIndex] = useState(0);
   const [channels, setChannels] = useState<ChannelData[]>([])
@@ -61,7 +61,7 @@ export default function Channel({ channelsStatic }: ChannelProps) {
 
     let data = { 'Todos os canais': channels } as ChannelsGroupedByCategory;
 
-    if (user && user.follow) {
+    if (isHydrated && user && user.follow) {
       data['Favoritos'] = channels.filter(item => user.follow.includes(item._id));
       data['Não seguidos'] = channels.filter(item => user.ignore.includes(item._id));
     }
@@ -73,7 +73,7 @@ export default function Channel({ channelsStatic }: ChannelProps) {
     })
 
     return data
-  }, [channels, user])
+  }, [channels, user, isHydrated])
 
   const categories = useMemo(() => {
     return Object.keys(channelsCategorized)

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState, useContext, ReactNode } from 'react'
+import React, { createContext, useCallback, useState, useContext, ReactNode, useEffect } from 'react'
 import { isServer } from '../utils';
 
 interface StyleSwitcherProps {
@@ -12,24 +12,25 @@ interface StyleData {
 interface StyleSwitcherContextData {
     alias: String;
     switchAlias(alias: string): void;
+    isHydrated: boolean;
 }
 
 const StyleSwitcherContext = createContext<StyleSwitcherContextData>({} as StyleSwitcherContextData);
 
 const StyleSwitcherProvider: React.FC<StyleSwitcherProps> = ({ children }) => {
     const [data, setData] = useState<StyleData>(() => {
-        if (isServer()) {
-            return { alias: 'dark' };
-        }
-
-        const theme = localStorage.getItem('@DevFinder:theme');
-
-        if (theme) {
-            return { alias: theme };
-        }
-
         return { alias: 'dark' };
     });
+
+    const [isHydrated, setIsHydrated] = useState(false);
+
+    useEffect(() => {
+        if (isServer()) return;
+
+        const theme = localStorage.getItem('@DevFinder:theme') || 'dark';
+        setData({ alias: theme });
+        setIsHydrated(true);
+    }, []);
 
     const switchAlias = useCallback(() => {
         if (isServer()) return;
@@ -44,7 +45,7 @@ const StyleSwitcherProvider: React.FC<StyleSwitcherProps> = ({ children }) => {
     }, [setData, data.alias])
 
     return (
-        <StyleSwitcherContext.Provider value={{ alias: data.alias, switchAlias }}>
+        <StyleSwitcherContext.Provider value={{ alias: data.alias, switchAlias, isHydrated }}>
             {children}
         </StyleSwitcherContext.Provider>
     )

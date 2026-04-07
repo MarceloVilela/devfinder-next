@@ -13,9 +13,11 @@ interface AppProviderProps {
 export type ThemeType = typeof night;
 
 const StyledProvider: React.FC<AppProviderProps> = ({ children }) => {
-    const { alias } = useStyleSwitcher();
+    const { alias, isHydrated } = useStyleSwitcher();
     
-    const theme = alias === 'dark' ? night : day
+    // Durante hidratação, sempre usar 'dark' para evitar mismatch
+    const themeAlias = isHydrated ? alias : 'dark';
+    const theme = themeAlias === 'dark' ? night : day
 
     return (
         <ThemeProvider theme={theme}>

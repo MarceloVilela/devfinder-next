@@ -24,7 +24,7 @@ export interface VideoData {
 }
 
 export default function Main({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) {
-  const { user } = useAuth();
+  const { user, isHydrated } = useAuth();
 
   return (
     <>
@@ -35,7 +35,7 @@ export default function Main({ docsStatic, totalStatic, itemsPerPageStatic }: Tr
         <Tabs className='wrap-tabs-inline'>
           <TabList>
             <Tab>Explorar</Tab>
-            {(user && user._id) &&
+            {isHydrated && (user && user._id) &&
               <Tab>Inscrições</Tab>
             }
 
@@ -46,7 +46,7 @@ export default function Main({ docsStatic, totalStatic, itemsPerPageStatic }: Tr
               <Trend docsStatic={docsStatic} totalStatic={totalStatic} itemsPerPageStatic={itemsPerPageStatic} />
             </>
           </TabPanel>
-          {(user && user._id) &&
+          {isHydrated && (user && user._id) &&
             <TabPanel>
               <Subs />
             </TabPanel>

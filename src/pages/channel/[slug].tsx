@@ -36,7 +36,7 @@ interface ChannelDetailProps {
 }
 
 const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, isHydrated } = useAuth();
   const router = useRouter();
 
   const [channel, setchannel] = useState<ChannelData>({} as ChannelData)
@@ -106,18 +106,18 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
   }, [channel.name, page])
 
   const includedInLike = useMemo(() => {
-    if (!user) {
+    if (!isHydrated || !user) {
       return false
     }
     return user.follow.includes(channel._id);
-  }, [user, channel])
+  }, [user, channel, isHydrated])
 
   const includedInDislike = useMemo(() => {
-    if (!user) {
+    if (!isHydrated || !user) {
       return false
     }
     return user.ignore.includes(channel._id);
-  }, [user, channel])
+  }, [user, channel, isHydrated])
 
   async function handleUndoDislike() {
     if (!user) {

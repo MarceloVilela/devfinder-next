@@ -9,10 +9,9 @@ import { Header, Container, Footer } from '../../components'
 import All, { UserAllProps } from './All';
 import Liked from './Liked';
 import Disliked from './Disliked';
-import { isServer } from '../../utils';
 
 export default function UserListPage({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) {
-  const { user } = useAuth();
+  const { user, isHydrated } = useAuth();
   
   return (
     <>
@@ -21,7 +20,7 @@ export default function UserListPage({ docsStatic, totalStatic, itemsPerPageStat
       <Head><title>Usuários | {process.env.NEXT_PUBLIC_TITLE}</title></Head>
       <Container loading={false}>
 
-        {(!isServer() && user && user._id) &&
+        {isHydrated && (user && user._id) &&
           <Tabs className='wrap-tabs-inline'>
             <TabList>
               <Tab>Início</Tab>
@@ -43,7 +42,7 @@ export default function UserListPage({ docsStatic, totalStatic, itemsPerPageStat
           </Tabs>
         }
 
-        {(!user || !user._id) &&
+        {isHydrated && (!user || !user._id) &&
           <Tabs className='wrap-tabs-inline'>
             <TabList>
               <Tab>Início</Tab>
