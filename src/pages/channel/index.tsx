@@ -33,6 +33,7 @@ export default function Channel({ channelsStatic }: ChannelProps) {
 
   useEffect(() => {
     setChannels(channelsStatic);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

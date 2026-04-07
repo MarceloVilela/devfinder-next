@@ -1,7 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
-import { ThemeType } from '../hooks/index'
 
-export default createGlobalStyle<{ theme: ThemeType }>`
+export default createGlobalStyle`
 * {
   margin: 0;
   padding: 0;
