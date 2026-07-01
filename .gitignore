@@ -40,4 +40,10 @@ yarn-error.log*
 #
 .env
 .env.local
+
 /md
+/src/pages/api/generate*.*
+client.http
+/src/pages/video/[slug].tsx
+/src/pages/video/VideoDetailStyle.ts
+/src/pages/transcription/
