@@ -1,0 +1,37 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { generateText } from 'ai'
+//@ts-ignore
+import { createOpenAI } from '@ai-sdk/openai'
+
+const openaiClient = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
+type Data = {
+  info: string
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>,
+) {
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ info: 'OPENAI_API_KEY não configurada' })
+  }
+
+  try {
+    const { text } = await generateText({
+      model: openaiClient('gpt-4o-mini'),
+      prompt: 'Explique sobre o changelog do Next.js 15',
+    })
+
+    res.status(200).json({ info: text })
+  } catch (error: any) {
+    console.error('Error generating text:', error)
+    res
+      .status(500)
+      .json({
+        info: `Error generating text: ${error?.message ?? 'unknown error'}`,
+      })
+  }
+}
