@@ -2,13 +2,23 @@
 
 Este arquivo fornece orientações ao Claude Code (claude.ai/code) ao trabalhar com o código deste repositório.
 
+## Processo (commits e PRs)
+
+Nunca fazer `git commit` nem abrir Pull Request por conta própria — só quando o humano pedir
+explicitamente naquela conversa. Preparar/mostrar o diff e sugerir a mensagem de commit é ok;
+executar o commit ou criar o PR sem pedido explícito, não.
+
+Nunca incluir trailer `Co-Authored-By: Claude ...` (ou qualquer variação) nas mensagens de
+commit deste repositório — isso faz o GitHub listar "claude" como contribuidor no repo, o que
+não é desejado aqui.
+
 ## Comandos
 
 ```bash
-npm run dev      # servidor de desenvolvimento em http://localhost:3000
-npm run build    # build de produção
-npm run start    # servidor de produção (requer build anterior)
-npm run lint     # ESLint via next lint
+pnpm dev      # servidor de desenvolvimento em http://localhost:3000
+pnpm build    # build de produção
+pnpm start    # servidor de produção (requer build anterior)
+pnpm lint     # ESLint via next lint
 ```
 
 ## Variáveis de ambiente

@@ -1,8 +1,8 @@
 # DevFinder
 
 <div flex-direction="row">
-  <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=TypeScript&label=typescript&message=v3.7.2&color=success" />
-  <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=React&label=react&message=v16.13.1&color=success" />  
+  <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=TypeScript&label=typescript&message=v6.0.2&color=success" />
+  <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=React&label=react&message=v19.2.4&color=success" />  
 </div>
 
 <div align="center">
@@ -35,11 +35,11 @@ Para a instalação do projeto, primeiramente baixe o <a href="https://nodejs.or
 
 Após a instalação do Node, você deve clonar o repositório:
 ```bash
-git clone https://github.com/MarceloVilela/devfinder.git
+git clone https://github.com/MarceloVilela/devfinder-next.git
 ```
 Após a clonagem, execute o comando abaixo dentro da pasta do projeto para baixar todas as dependências:
 ```bash
-npm install
+pnpm install
 ```
 
 #### 3.Variáveis ambiente
@@ -52,7 +52,7 @@ altere caso necessário.
 Após clonar, execute o comando abaixo:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Abra [http://localhost:3000](http://localhost:3000) em seu navegador para utilizar a aplicação.
