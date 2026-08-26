@@ -1,0 +1,46 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { generateText } from 'ai'
+//@ts-ignore
+import { createDeepSeek } from '@ai-sdk/deepseek'
+
+// Configuramos o cliente DeepSeek usando o SDK dedicado
+const deepseek = createDeepSeek({
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL:
+    (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com').replace(
+      /\/$/,
+      '',
+    ) + '/v1',
+})
+
+type Data = {
+  info: string
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>,
+) {
+  if (!process.env.DEEPSEEK_API_KEY) {
+    return res
+      .status(500)
+      .json({ info: 'DEEPSEEK_API_KEY não está configurada' })
+  }
+
+  try {
+    const modelName = 'deepseek-v3'
+    const { text } = await generateText({
+      model: deepseek(modelName),
+      prompt: 'Explique sobre o changelog do Next.js 15',
+    })
+
+    res.status(200).json({ info: text })
+  } catch (error: any) {
+    console.error('DeepSeek generateText error:', error)
+    res
+      .status(500)
+      .json({
+        info: `Error generating text: ${error?.message ?? 'unknown error'}`,
+      })
+  }
+}
