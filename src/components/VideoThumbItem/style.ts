@@ -11,9 +11,7 @@ export const Thumb = styled.li`
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.thumb img {
+  position: relative;
   width: 100%;
   aspect-ratio: 16/9;
 }

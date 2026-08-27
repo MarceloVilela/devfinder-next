@@ -248,6 +248,7 @@ export default function Refresh() {
               <ScreenshotRow>
                 {screenshots.map((source) => (
                   <ScreenshotItem key={source}>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- host dinâmico via NEXT_PUBLIC_API_AUTO, não dá para whitelisting em next.config.js */}
                     <img src={source} alt="screenshot" />
                     <p>{source}</p>
                   </ScreenshotItem>

@@ -10,7 +10,7 @@ import { useAuth } from '../../hooks/auth';
 import { Header, Container, Footer, ChannelItem } from '../../components'
 import { ChannelData } from './[slug]'
 import ChannelContainer from './style';
-import { delay } from '../../utils';
+import { delay, getErrorMessage } from '../../utils';
 
 interface ChannelsGroupedByCategory {
   [key: string]: ChannelData[];
@@ -47,7 +47,7 @@ export default function Channel({ channelsStatic }: ChannelProps) {
         const response = await api.get('/channels')
         setChannels(response.data)
       } catch (error) {
-        toast.error('Erro ao listar canais')
+        toast.error(getErrorMessage(error, 'Não encontrado.'))
       } finally {
         setloading(false)
       }

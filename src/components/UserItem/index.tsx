@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 import { UserData } from '../../hooks/auth'
 import { UserThumb } from './style';
 
@@ -19,7 +21,7 @@ const UserItem: React.FC<UserItemProps> = ({ user, placeholder, children }) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img src={user.avatar} alt={user.name}  />
+                <Image src={user.avatar} alt={user.name} width={48} height={48} />
               </a>
             </div>
 

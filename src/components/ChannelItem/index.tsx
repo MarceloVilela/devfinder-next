@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 import { ChannelData } from '../../pages/channel/[slug]';
 import { ChannelThumb } from './style';
@@ -20,9 +21,11 @@ const ChannelItem: React.FC<ItemProps> = ({ item, placeholder }) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img
+                <Image
                   src={item.avatar ? item.avatar : 'https://yt3.ggpht.com/a/AATXAJzF6fuUyEFRBtZSpScb9M-Dq4QI6pyv0ic3pw=s100-c-k-c0xffffffff-no-rj-mo'}
                   alt={item.name}
+                  width={64}
+                  height={64}
                 />
               </a>
             </div>

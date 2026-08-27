@@ -30,7 +30,7 @@ const Footer: React.FC = () => {
           </a>
         </div>
         <div>
-          <p onClick={() => switchAlias('')}>Tema {alias}</p>
+          <p onClick={() => switchAlias()}>Tema {alias}</p>
         </div>
       </div>
     </Wrapper>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Image from 'next/image';
 import { FaGithub, FaHome } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -8,23 +9,10 @@ import axios from 'axios';
 import api from '../../services/api'
 import { Header, Container, Footer } from '../../components'
 import About from './UserDetailStyle'
+import { UserData } from '../../hooks/auth'
+import { getErrorMessage } from '../../utils'
 
-interface UserDetailProps {
-  match: {
-    params: {
-      username: string;
-    }
-  }
-}
-
-interface UserData {
-  name: string;
-  user: string;
-  bio: string;
-  avatar: string;
-}
-
-const UserDetail: React.FC<UserDetailProps> = ({ match }) => {
+const UserDetail: React.FC = () => {
   const router = useRouter();
 
   const [user, setUser] = useState({} as UserData)
@@ -51,7 +39,10 @@ const UserDetail: React.FC<UserDetailProps> = ({ match }) => {
         setUser(data);
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) {
-          toast.error(`Erro ao listar detalhes do usuário: ${username}`);
+          toast.error(getErrorMessage(error, `Usuário ${username} não encontrado.`), {
+            autoClose: false,
+            closeOnClick: false,
+          });
         }
       } finally {
         setLoading(false);
@@ -70,10 +61,12 @@ const UserDetail: React.FC<UserDetailProps> = ({ match }) => {
         {'name' in user && (
           <About>
             <Head><title>Usuário {user.name} | {process.env.NEXT_PUBLIC_TITLE}</title></Head>
-            <img
+            <Image
               className="thumb"
               src={user.avatar}
               alt={user.user}
+              width={270}
+              height={270}
             />
 
             <p className="title">{user.name}</p>

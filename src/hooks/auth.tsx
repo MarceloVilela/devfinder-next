@@ -1,115 +1,61 @@
-import React, { createContext, useCallback, useState, useContext, ReactNode, useEffect } from 'react';
+import { useCallback } from 'react';
+
 import api from '../services/api';
 import { isServer } from '../utils';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { authActions, UserData } from '../store/slices/authSlice';
+import type { AppDispatch } from '../store';
 
-interface AuthProviderProps {
-    children: ReactNode;
-}
+export type { UserData };
 
-export interface UserData {
-    likes: string[];
-    deslikes: string[];
-    follow: string[];
-    ignore: string[];
-    _id: string;
-    name: string;
-    user: string;
-    bio?: string;
-    avatar: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
+export const hydrateAuth = () => (dispatch: AppDispatch) => {
+  if (isServer()) return;
 
-interface AuthData {
-    token: string;
-    user: UserData;
-}
+  const token = localStorage.getItem('@DevFinder:token');
+  const user = localStorage.getItem('@DevFinder:user');
 
-interface ReturnedCode {
-    token: string;
-}
+  if (token && user) {
+    const userParsed = JSON.parse(user);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    dispatch(authActions.setCredentials({ token, user: userParsed }));
+  }
 
-interface AuthContextData {
-    user: UserData;
-    setUser(user: UserData): void;
-    socialAuthCallback(data: AuthData): void;
-    signOut(): void;
-    message: {
-        content?: string;
-        type?: string;
-    };
-    isHydrated: boolean;
-}
-
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
-
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [message] = useState({})
-    const [data, setData] = useState<AuthData>(() => {
-        return {} as AuthData;
-    });
-
-    const [isHydrated, setIsHydrated] = useState(false);
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-
-        const token = localStorage.getItem('@DevFinder:token');
-        const user = localStorage.getItem('@DevFinder:user');
-
-        if (token && user) {
-            const userParsed = JSON.parse(user);
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            setData({ token, user: userParsed });
-        }
-
-        setIsHydrated(true);
-    }, []);
-
-    const signOut = useCallback(() => {
-        if (isServer()) return;
-
-        localStorage.removeItem('@DevFinder:token');
-        localStorage.removeItem('@DevFinder:user');
-
-        setData({} as AuthData);
-    }, [])
-
-    const socialAuthCallback = useCallback(({ token, user }: {token: string, user: UserData}) => {
-        if (isServer()) return;
-        
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-        localStorage.setItem('@DevFinder:token', token);
-        localStorage.setItem('@DevFinder:user', JSON.stringify(user));
-
-        setData({ token, user });
-
-        return;
-    }, [setData])
-
-    const setUser = useCallback((user: UserData) => {
-        if (isServer()) return;
-
-        setData({
-            token: data.token,
-            user
-        });
-
-        localStorage.setItem('@DevFinder:user', JSON.stringify(user));
-    }, [setData, data.token])
-
-    return (
-        <AuthContext.Provider value={{ user: data.user, setUser, signOut, socialAuthCallback, message, isHydrated }}>
-            {children}
-        </AuthContext.Provider>
-    )
+  dispatch(authActions.setHydrated(true));
 };
 
 function useAuth() {
-    const context = useContext<AuthContextData>(AuthContext);
+  const dispatch = useAppDispatch();
+  const { user, message, isHydrated } = useAppSelector((state) => state.auth);
 
-    return context;
+  const signOut = useCallback(() => {
+    if (isServer()) return;
+
+    localStorage.removeItem('@DevFinder:token');
+    localStorage.removeItem('@DevFinder:user');
+
+    dispatch(authActions.signOut());
+  }, [dispatch]);
+
+  const socialAuthCallback = useCallback(({ token, user }: { token: string; user: UserData }) => {
+    if (isServer()) return;
+
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    localStorage.setItem('@DevFinder:token', token);
+    localStorage.setItem('@DevFinder:user', JSON.stringify(user));
+
+    dispatch(authActions.setCredentials({ token, user }));
+  }, [dispatch]);
+
+  const setUser = useCallback((user: UserData) => {
+    if (isServer()) return;
+
+    localStorage.setItem('@DevFinder:user', JSON.stringify(user));
+
+    dispatch(authActions.setUser(user));
+  }, [dispatch]);
+
+  return { user, setUser, signOut, socialAuthCallback, message, isHydrated };
 }
 
-export { AuthProvider, useAuth }
+export { useAuth };

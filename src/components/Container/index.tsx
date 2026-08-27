@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import Image from 'next/image';
 
 import Main from './style';
 
@@ -15,9 +16,12 @@ const Container: React.FC<ContainerProps> = ({ children, loading, className, uns
       {loading
         ? (
           <article className='loading-wrapper'>
-            <img
+            <Image
               src="/load.gif"
-              alt="Loading"              
+              alt="Loading"
+              width={64}
+              height={64}
+              unoptimized
             />
           </article>
         )

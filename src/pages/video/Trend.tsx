@@ -6,6 +6,7 @@ import api from '../../services/api'
 import { Paginate, VideoThumbItem, Container } from '../../components'
 import { VideoData } from './index'
 import { VideoList } from './style'
+import { getErrorMessage } from '../../utils'
 //import { delay } from '../../utils'
 
 export interface TrendProps {
@@ -43,7 +44,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
         setTotal(data.total);
         setItemsPerPage(data.itemsPerPage);
       } catch (error) {
-        toast.error('Erro ao listar feed')
+        toast.error(getErrorMessage(error, 'Não encontrado.'))
       } finally {
         setLoading(false)
       }

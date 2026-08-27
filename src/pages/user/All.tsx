@@ -7,6 +7,7 @@ import api from '../../services/api'
 import { useAuth, UserData } from '../../hooks/auth'
 import { Container, UserItem, Paginate } from '../../components'
 import UsersList from './style'
+import { getErrorMessage } from '../../utils'
 
 export interface UserAllProps {
   docsStatic: UserData[];
@@ -44,7 +45,7 @@ function All({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) {
         setTotal(data.total);
         setItemsPerPage(data.itemsPerPage);
       } catch (error) {
-        toast.error('Erro ao listar devs')
+        toast.error(getErrorMessage(error, 'Não encontrado.'))
       } finally {
         setLoading(false)
       }

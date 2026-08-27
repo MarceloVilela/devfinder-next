@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Image from 'next/image';
 import { FaYoutube, FaHome } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 import api from '../../services/api'
 import { Header, Container, Footer } from '../../components'
 import { VideoData } from './index'
 import About from './VideoDetailStyle'
+import { getErrorMessage } from '../../utils'
 
-interface VideoDetailProps {
-  match: {
-    params: {
-      id: string;
-    }
-  }
-}
-
-const VideoDetail: React.FC<VideoDetailProps> = ({ match }) => {
+const VideoDetail: React.FC = () => {
   const router = useRouter();
 
   const [video, setVideo] = useState({} as VideoData)
@@ -43,7 +38,12 @@ const VideoDetail: React.FC<VideoDetailProps> = ({ match }) => {
 
         setVideo(data);
       } catch (error) {
-        toast.error(`Erro ao listar detalhes do vídeo: ${idYoutubeWatch}`);
+        if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+          toast.error(getErrorMessage(error, `Vídeo ${idYoutubeWatch} não encontrado.`), {
+            autoClose: false,
+            closeOnClick: false,
+          });
+        }
       } finally {
         setLoading(false);
       }
@@ -61,10 +61,13 @@ const VideoDetail: React.FC<VideoDetailProps> = ({ match }) => {
         {(video && '_id' in video) && (
           <About>
             <Head><title>Vídeo {video.title} | {process.env.NEXT_PUBLIC_TITLE}</title></Head>
-            <img
+            <Image
               className="thumb"
               src={video.thumbnail}
-              alt={video.title}       
+              alt={video.title}
+              width={480}
+              height={360}
+              style={{ width: '270px', height: 'auto' }}
             />
 
             <p>{video.title}</p>

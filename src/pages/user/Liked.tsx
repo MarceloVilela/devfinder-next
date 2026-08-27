@@ -6,6 +6,7 @@ import api from '../../services/api'
 import { useAuth, UserData } from '../../hooks/auth'
 import { Container, UserItem } from '../../components'
 import UsersList from './style'
+import { getErrorMessage } from '../../utils'
 
 function Liked() {
   const { user } = useAuth();
@@ -22,7 +23,7 @@ function Liked() {
         const { data } = await api.get('/likes/devs')
         setDocs(data)
       } catch (error) {
-        toast.error('Erro ao listar devs')
+        toast.error(getErrorMessage(error, 'Não encontrado.'))
       } finally {
         setLoading(false)
       }

@@ -1,60 +1,34 @@
-import React, { createContext, useCallback, useState, useContext, ReactNode, useEffect } from 'react'
+import { useCallback } from 'react';
+
 import { isServer } from '../utils';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { themeActions, ThemeAlias } from '../store/slices/themeSlice';
+import type { AppDispatch } from '../store';
 
-interface StyleSwitcherProps {
-    children: ReactNode;
-}
+export const hydrateTheme = () => (dispatch: AppDispatch) => {
+  if (isServer()) return;
 
-interface StyleData {
-    alias: string;
-}
+  const alias = (localStorage.getItem('@DevFinder:theme') as ThemeAlias) || 'dark';
 
-interface StyleSwitcherContextData {
-    alias: String;
-    switchAlias(alias: string): void;
-    isHydrated: boolean;
-}
-
-const StyleSwitcherContext = createContext<StyleSwitcherContextData>({} as StyleSwitcherContextData);
-
-const StyleSwitcherProvider: React.FC<StyleSwitcherProps> = ({ children }) => {
-    const [data, setData] = useState<StyleData>(() => {
-        return { alias: 'dark' };
-    });
-
-    const [isHydrated, setIsHydrated] = useState(false);
-
-    useEffect(() => {
-        if (isServer()) return;
-
-        const theme = localStorage.getItem('@DevFinder:theme') || 'dark';
-        setData({ alias: theme });
-        setIsHydrated(true);
-    }, []);
-
-    const switchAlias = useCallback(() => {
-        if (isServer()) return;
-
-        const alias = data.alias === 'dark' ? 'light' : 'dark';
-        
-        setData({
-            alias,
-        });
-
-        localStorage.setItem('@DevFinder:theme', alias);
-    }, [setData, data.alias])
-
-    return (
-        <StyleSwitcherContext.Provider value={{ alias: data.alias, switchAlias, isHydrated }}>
-            {children}
-        </StyleSwitcherContext.Provider>
-    )
+  dispatch(themeActions.setAlias(alias));
+  dispatch(themeActions.setHydrated(true));
 };
 
 function useStyleSwitcher() {
-    const context = useContext<StyleSwitcherContextData>(StyleSwitcherContext);
+  const dispatch = useAppDispatch();
+  const { alias, isHydrated } = useAppSelector((state) => state.theme);
 
-    return context;
+  const switchAlias = useCallback(() => {
+    if (isServer()) return;
+
+    const next: ThemeAlias = alias === 'dark' ? 'light' : 'dark';
+
+    localStorage.setItem('@DevFinder:theme', next);
+
+    dispatch(themeActions.setAlias(next));
+  }, [dispatch, alias]);
+
+  return { alias, switchAlias, isHydrated };
 }
 
-export { StyleSwitcherProvider, useStyleSwitcher }
+export { useStyleSwitcher };

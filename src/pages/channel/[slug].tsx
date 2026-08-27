@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Image from 'next/image';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 import { MdSyncDisabled, MdStarBorder } from 'react-icons/md'
 import { toast } from 'react-toastify';
@@ -12,6 +13,7 @@ import { Header, Container, Footer, VideoThumbItem, Paginate } from '../../compo
 import { VideoData } from '../video'
 import About from './ChannelDetailStyle'
 import { VideoList } from '../video/style';
+import { getErrorMessage } from '../../utils'
 
 export interface ChannelData {
   tags: string[];
@@ -28,15 +30,7 @@ export interface ChannelData {
   avatar: string;
 }
 
-interface ChannelDetailProps {
-  match: {
-    params: {
-      id: string;
-    }
-  }
-}
-
-const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
+const ChannelDetail: React.FC = () => {
   const { user, setUser, isHydrated } = useAuth();
   const router = useRouter();
 
@@ -74,7 +68,10 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
         setItemsPerPage(videoData.itemsPerPage);
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) {
-          toast.error(`Erro ao listar detalhes do canal: ${search_query}`)
+          toast.error(getErrorMessage(error, `Canal ${search_query} não encontrado.`), {
+            autoClose: false,
+            closeOnClick: false,
+          })
         }
       } finally {
         setLoading(false)
@@ -195,9 +192,11 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
                 <Head><title>Canal {channel.name} | {process.env.NEXT_PUBLIC_TITLE}</title></Head>
                 <li key={channel._id}>
                   <div className="avatar">
-                    <img
+                    <Image
                       src={channel.avatar ? channel.avatar : 'https://yt3.ggpht.com/a/AATXAJzF6fuUyEFRBtZSpScb9M-Dq4QI6pyv0ic3pw=s100-c-k-c0xffffffff-no-rj-mo'}
                       alt={channel.name}
+                      width={100}
+                      height={100}
                     />
                   </div>
 

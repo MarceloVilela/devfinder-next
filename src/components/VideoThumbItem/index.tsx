@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 import { VideoData } from '../../pages/video/index';
 import { Thumb } from './style';
@@ -22,18 +23,22 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
               rel="noopener noreferrer"
             >
               <div className="thumb">
-                <img
+                <Image
                   src={video.thumbnail}
                   alt={video.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
             </a>
 
             <footer className='container-edge-spacing'>
               <div className='avatar'>
-                <img
+                <Image
                   src={video.thumbnail}
                   alt={video.title}
+                  width={40}
+                  height={40}
                 />
               </div>
 
