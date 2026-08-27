@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+
+# "pnpm build" fica fora do gate de PR de propósito: "/", "/user" e "/channel" usam
+# getStaticProps chamando NEXT_PUBLIC_API_URL diretamente, sem fallback — o build só passa com
+# um backend real e acessível no ar (verificado localmente com devfinder-api rodando). Não há
+# hoje uma URL pública estável do backend para apontar o CI (as opções antigas em .env.example
+# — herokuapp.com, onrender.com — não respondem mais). Gatear o PR nisso tornaria o CI refém da
+# disponibilidade de um serviço externo fora do controle deste repositório.

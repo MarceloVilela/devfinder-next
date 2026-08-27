@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 import { MdSyncDisabled, MdStarBorder } from 'react-icons/md'
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 import api from '../../services/api'
 import { useAuth } from '../../hooks/auth';
@@ -72,7 +73,9 @@ const ChannelDetail: React.FC<ChannelDetailProps> = ({ match }) => {
         setTotal(videoData.total);
         setItemsPerPage(videoData.itemsPerPage);
       } catch (error) {
-        toast.error(`Erro ao listar detalhes do canal: ${search_query}`)
+        if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+          toast.error(`Erro ao listar detalhes do canal: ${search_query}`)
+        }
       } finally {
         setLoading(false)
       }

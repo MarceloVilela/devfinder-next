@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { FaGithub, FaHome } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 import api from '../../services/api'
 import { Header, Container, Footer } from '../../components'
@@ -49,7 +50,9 @@ const UserDetail: React.FC<UserDetailProps> = ({ match }) => {
 
         setUser(data);
       } catch (error) {
-        toast.error(`Erro ao listar detalhes do usuário: ${username}`);
+        if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+          toast.error(`Erro ao listar detalhes do usuário: ${username}`);
+        }
       } finally {
         setLoading(false);
       }

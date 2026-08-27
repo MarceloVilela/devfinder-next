@@ -4,6 +4,7 @@ const About = styled.article`
 display: flex;
 flex-direction: column;
 width: 270px;
+width: 100%;
 align-items: center;
 margin: 0 auto;
 

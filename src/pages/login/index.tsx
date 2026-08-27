@@ -38,6 +38,7 @@ const Login: React.FC = () => {
 
     if (typeof token === 'string') {
       loadProfile(token);
+      router.replace('/login', undefined, { shallow: true });
     }
   }, [router, loadProfile])
 
