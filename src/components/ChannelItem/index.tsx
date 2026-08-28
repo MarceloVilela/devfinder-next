@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-import { ChannelData } from '../../pages/channel/[slug]';
+import { ChannelData } from '../../types';
 import { ChannelThumb } from './style';
 
 interface ItemProps {

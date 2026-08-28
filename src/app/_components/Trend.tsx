@@ -1,0 +1,75 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useSearchParams } from 'next/navigation';
+
+import api from '../../services/api';
+import { Paginate, VideoThumbItem, Container } from '../../components';
+import { VideoData } from '../../types';
+import { VideoList } from '../video/style';
+import { getErrorMessage } from '../../utils';
+
+export interface TrendProps {
+  docsStatic: VideoData[];
+  totalStatic: number;
+  itemsPerPageStatic: number;
+}
+
+const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
+  const [loading, setLoading] = useState(false);
+  const [docs, setDocs] = useState<VideoData[]>([] as VideoData[])
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(0);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    setDocs(docsStatic);
+    setTotal(totalStatic);
+    setItemsPerPage(itemsPerPageStatic);
+  }, [docsStatic, itemsPerPageStatic, totalStatic])
+
+  useEffect(() => {
+    async function loadDocs() {
+      try {
+        if (page != 1) {
+          setLoading(true)
+          setDocs(Array.from(Array(30)).map(item => ({} as VideoData)))
+        }
+
+        const userParam = searchParams?.get('user');
+        const userIdentifier = userParam ? { user: userParam } : {};
+
+        const { data } = await api.get('/feed/trending', { params: { page, ...userIdentifier } })
+        setDocs(data.docs)
+        setTotal(data.total);
+        setItemsPerPage(data.itemsPerPage);
+      } catch (error) {
+        toast.error(getErrorMessage(error, 'Não encontrado.'))
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadDocs()
+  }, [page, searchParams])
+
+  return (
+    <Container loading={false} unstylized className='container-full-width'>
+      <>
+
+        <VideoList className="subs list-flex-column">
+          {docs?.map((item, key) => (
+            <VideoThumbItem key={key} video={item} placeholder={loading} />
+          ))}
+        </VideoList>
+        {!loading &&
+          <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} handlePaginate={setPage} />
+        }
+
+      </>
+    </Container>
+  )
+}
+
+export default Trend;

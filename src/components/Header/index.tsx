@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   FaYoutube,
   FaGithub,

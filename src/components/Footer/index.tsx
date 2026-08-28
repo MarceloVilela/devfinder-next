@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { FaGithub, FaYoutube } from 'react-icons/fa';
 import { useStyleSwitcher } from '../../hooks/styleSwitcher';
