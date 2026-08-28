@@ -56,3 +56,13 @@ pnpm dev
 ```
 
 Abra [http://localhost:3000](http://localhost:3000) em seu navegador para utilizar a aplicação.
+
+## Arquitetura de renderização
+
+App Router. SSR/ISR em **todas** as rotas de dado público — listagem (`/`, `/video`, `/user`,
+`/channel`, revalidação de 8h) e detalhe (`/user/:slug`, `/video/:slug`, `/channel/:slug`,
+renderizado por request, sem `generateStaticParams` porque o conjunto de slugs é aberto). A
+interatividade (like/dislike, paginação além da página 1) fica isolada em Client Components na
+folha da árvore. A única exceção é o que depende da sessão do usuário logado (favoritos,
+inscrições) — a sessão vive em `localStorage`, inacessível a um Server Component sem cookie
+`httpOnly`, então essas telas continuam CSR.

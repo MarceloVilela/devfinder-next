@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-import { VideoData } from '../../pages/video/index';
+import { VideoData } from '../../types';
 import { Thumb } from './style';
 
 interface ItemProps {
