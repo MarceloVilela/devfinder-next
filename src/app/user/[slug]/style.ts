@@ -8,19 +8,19 @@ align-items: center;
 margin: 0 auto;
 
 p {
-  color: ${props => props.theme.foreground};
+  color: var(--color-foreground);
   align-self: flex-start;
   text-align: left;
 }
 
 .title {
   font-size: 2rem;
-  color: ${props => props.theme.foregroundStronger};
+  color: var(--color-foreground-stronger);
 }
 
 .bio {
   margin: 24px 0;
-  color: ${props => props.theme.foregroundStrong};
+  color: var(--color-foreground-strong);
 }
 
 .thumb {
@@ -44,7 +44,7 @@ p {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
   border: 0;
   border-radius: 4px;
-  background: ${props => props.theme.primaryStronger};
+  background: var(--color-primary-stronger);
   cursor: pointer;
   color: #fff;
   display: flex;

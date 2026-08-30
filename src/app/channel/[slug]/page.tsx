@@ -12,6 +12,7 @@ import ChannelVideoFeed from '../../_components/ChannelVideoFeed';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 interface ChannelFeed {
@@ -20,18 +21,18 @@ interface ChannelFeed {
   itemsPerPage: number;
 }
 
+// A API devolve 200 + corpo `null` quando o canal não existe (não 404) — fetchJSON já repassa
+// esse `null` naturalmente. Sem try/catch aqui: erro de rede real (API fora do ar) sobe pro
+// error.tsx em vez de virar "não encontrado" — só ausência de dado vira notFound().
 async function getChannel(searchQuery: string): Promise<ChannelData | null> {
-  try {
-    return await fetchJSON<ChannelData>(`/channels/${searchQuery}`, { cache: 'no-store' });
-  } catch {
-    return null;
-  }
+  return fetchJSON<ChannelData | null>(`/channels/${searchQuery}`, { cache: 'no-store' });
 }
 
-async function getChannelFeed(channelName: string): Promise<ChannelFeed> {
-  return fetchJSON<ChannelFeed>(`/feed/channel?channel_name=${encodeURIComponent(channelName)}`, {
-    cache: 'no-store',
-  });
+async function getChannelFeed(channelName: string, page: number): Promise<ChannelFeed> {
+  return fetchJSON<ChannelFeed>(
+    `/feed/channel?channel_name=${encodeURIComponent(channelName)}&page=${page}`,
+    { cache: 'no-store' },
+  );
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -45,15 +46,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title: `Canal ${channel.name}` };
 }
 
-export default async function ChannelDetail({ params }: PageProps) {
+export default async function ChannelDetail({ params, searchParams }: PageProps) {
   const { slug } = await params;
+  const { page } = await searchParams;
+  const currentPage = Number(page) || 1;
+
   const channel = await getChannel(slug);
 
   if (!channel) {
     notFound();
   }
 
-  const { docs, total, itemsPerPage } = await getChannelFeed(channel.name);
+  const { docs, total, itemsPerPage } = await getChannelFeed(channel.name, currentPage);
 
   return (
     <>
@@ -111,10 +115,10 @@ export default async function ChannelDetail({ params }: PageProps) {
         </About>
 
         <ChannelVideoFeed
-          channelName={channel.name}
-          initialDocs={docs}
-          initialTotal={total}
-          initialItemsPerPage={itemsPerPage}
+          docsStatic={docs}
+          totalStatic={total}
+          itemsPerPageStatic={itemsPerPage}
+          page={currentPage}
         />
       </Container>
 

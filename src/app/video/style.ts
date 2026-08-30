@@ -33,7 +33,7 @@ export const VideoList = styled.ul`
 
   @media (max-width: 599px) {
     & li.card {
-      background-color: ${props => props.theme.backgroundWeak};
+      background-color: var(--color-background-weak);
       padding: 1rem;
       margin-left: 1rem;
       margin-right: 1rem;

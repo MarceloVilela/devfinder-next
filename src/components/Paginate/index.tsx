@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
 import { PaginateList } from './style';
@@ -9,10 +10,23 @@ interface PaginateProps {
   page: number;
   totalItems?: number;
   itemsPerPage?: number;
-  handlePaginate(goTo: number): void;
+  // Opcional: quando ausente, o Paginate navega sozinho via `?page=N` na URL (usado pelas
+  // listagens SSR/RSC). Passe um callback só quando a paginação for controlada localmente por
+  // estado do próprio componente pai (ex.: Subs.tsx, que é CSR por depender da sessão).
+  handlePaginate?(goTo: number): void;
 }
 
 const Paginate: React.FC<PaginateProps> = ({ page, totalItems, itemsPerPage, handlePaginate }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const navigateToPage = useCallback((goTo: number) => {
+    const params = new URLSearchParams(searchParams?.toString());
+    params.set('page', String(goTo));
+    router.push(`${pathname}?${params.toString()}`);
+  }, [router, pathname, searchParams]);
+
   const totalPages = useMemo(() => {
     if (totalItems && itemsPerPage) {
       return Math.ceil(totalItems / itemsPerPage);
@@ -25,17 +39,16 @@ const Paginate: React.FC<PaginateProps> = ({ page, totalItems, itemsPerPage, han
   }, [totalPages])
 
   const shortenedList = useMemo(() => {
-    if (page - 3 < 0) {
-      return numberedList.splice(0, 5)
-    }
-    else {
-      return numberedList.splice(page - 3, 5)
-    }
+    // .slice (não .splice): .splice muta o array original, e numberedList só é recalculado
+    // quando totalPages muda — como o total não muda entre páginas de uma mesma listagem, a
+    // navegação client-side (sem remount) ia corroendo o mesmo array a cada clique.
+    const start = page - 3 < 0 ? 0 : page - 3;
+    return numberedList.slice(start, start + 5)
   }, [numberedList, page])
 
   const _handlePaginate = (page: number) => {
     window.scrollTo(0, 0);
-    handlePaginate(page);
+    (handlePaginate ?? navigateToPage)(page);
   }
 
   return (

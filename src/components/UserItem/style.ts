@@ -2,7 +2,6 @@ import styled from 'styled-components'
 
 export const UserThumb = styled.li`
 & {
-    border: 1px solid ${props => props.theme.backgroundWeakerer};
     border: none;
     border-radius: 10px;
 
@@ -10,7 +9,7 @@ export const UserThumb = styled.li`
 }
 
 &.card {
-    background: ${props => props.theme.backgroundWeak};
+    background: var(--color-background-weak);
     margin-bottom: 1rem;
 }
 
@@ -34,8 +33,6 @@ aside {
     flex-direction: column;
     justify-content: space-between;
     flex: 1;
-    background-color: ${props => props.theme.backgroundWeakerer};
-    border: 1px solid ${props => props.theme.backgroundWeakerer};
     background: inherit;
     border: none;
     padding: 15px 20px;
@@ -52,15 +49,15 @@ aside header {
 
 aside strong {
     font-size: 16px;
-    color: ${props => props.theme.foregroundStronger};
+    color: var(--color-foreground-stronger);
 }
 
 aside small {
     display: block;
     overflow: hidden;
-    
+
     font-size: 14px;
-    color: ${props => props.theme.foregroundStronger};
+    color: var(--color-foreground-stronger);
     margin-top: 5px;
 }
 

@@ -12,12 +12,11 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// A API devolve 200 + corpo `null` quando o vídeo não existe (não 404) — fetchJSON já repassa
+// esse `null` naturalmente. Sem try/catch aqui: erro de rede real (API fora do ar) sobe pro
+// error.tsx em vez de virar "não encontrado" — só ausência de dado vira notFound().
 async function getVideo(idYoutubeWatch: string): Promise<VideoData | null> {
-  try {
-    return await fetchJSON<VideoData>(`/video/${idYoutubeWatch}`, { cache: 'no-store' });
-  } catch {
-    return null;
-  }
+  return fetchJSON<VideoData | null>(`/video/${idYoutubeWatch}`, { cache: 'no-store' });
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

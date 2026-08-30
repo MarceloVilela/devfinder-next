@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 // @ts-ignore
 import 'react-tabs/style/react-tabs.css';
@@ -8,10 +8,13 @@ import 'react-tabs/style/react-tabs.css';
 import { useAuth } from '../../hooks/auth';
 import { Footer, Header } from '../../components';
 import Subs from './Subs';
-import Trend, { TrendProps } from './Trend';
 import ContainerFullWidth from '../video/style';
 
-export default function HomeFeed({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) {
+interface HomeFeedProps {
+  children: ReactNode;
+}
+
+export default function HomeFeed({ children }: HomeFeedProps) {
   const { user, isHydrated } = useAuth();
 
   return (
@@ -28,9 +31,7 @@ export default function HomeFeed({ docsStatic, totalStatic, itemsPerPageStatic }
           </TabList>
 
           <TabPanel>
-            <>
-              <Trend docsStatic={docsStatic} totalStatic={totalStatic} itemsPerPageStatic={itemsPerPageStatic} />
-            </>
+            {children}
           </TabPanel>
           {isHydrated && (user && user._id) &&
             <TabPanel>

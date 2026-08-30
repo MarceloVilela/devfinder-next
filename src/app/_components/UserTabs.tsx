@@ -1,15 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 import { useAuth } from '../../hooks/auth';
 import { Container } from '../../components';
-import UserAll, { UserAllProps } from './UserAll';
 import UserLiked from './UserLiked';
 import UserDisliked from './UserDisliked';
 
-export default function UserTabs({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) {
+interface UserTabsProps {
+  children: ReactNode;
+}
+
+export default function UserTabs({ children }: UserTabsProps) {
   const { user, isHydrated } = useAuth();
 
   return (
@@ -24,7 +27,7 @@ export default function UserTabs({ docsStatic, totalStatic, itemsPerPageStatic }
           </TabList>
 
           <TabPanel>
-            <UserAll docsStatic={docsStatic} totalStatic={totalStatic} itemsPerPageStatic={itemsPerPageStatic} />
+            {children}
           </TabPanel>
 
           <TabPanel>
@@ -44,9 +47,7 @@ export default function UserTabs({ docsStatic, totalStatic, itemsPerPageStatic }
           </TabList>
 
           <TabPanel>
-            <>
-              <UserAll docsStatic={docsStatic} totalStatic={totalStatic} itemsPerPageStatic={itemsPerPageStatic} />
-            </>
+            {children}
           </TabPanel>
         </Tabs>
       }

@@ -1,6 +1,23 @@
 import { createGlobalStyle } from 'styled-components'
 
 export default createGlobalStyle`
+/* Variáveis de CSS espelhando o Theme — necessário porque Server Components não conseguem ler
+   o Context do ThemeProvider (limitação do React, não bug: Context nunca atravessa a fronteira
+   Server/Client, mesmo com o Provider mais acima na árvore). Styled-components usados dentro de
+   Server Components leem essas variáveis em vez de props.theme.*; GlobalStyle roda dentro do
+   ThemeProvider (Client) e é a única fonte de verdade que ainda lê o tema via prop diretamente. */
+:root {
+  --color-primary: ${props => props.theme.primary};
+  --color-primary-strong: ${props => props.theme.primaryStrong};
+  --color-primary-stronger: ${props => props.theme.primaryStronger};
+  --color-background-weakerer: ${props => props.theme.backgroundWeakerer};
+  --color-background-weak: ${props => props.theme.backgroundWeak};
+  --color-background: ${props => props.theme.background};
+  --color-foreground: ${props => props.theme.foreground};
+  --color-foreground-strong: ${props => props.theme.foregroundStrong};
+  --color-foreground-stronger: ${props => props.theme.foregroundStronger};
+}
+
 * {
   margin: 0;
   padding: 0;

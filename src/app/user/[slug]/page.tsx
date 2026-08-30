@@ -12,12 +12,11 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// A API devolve 200 + corpo `null` quando o dev não existe (não 404) — fetchJSON já repassa
+// esse `null` naturalmente. Sem try/catch aqui: erro de rede real (API fora do ar) sobe pro
+// error.tsx em vez de virar "não encontrado" — só ausência de dado vira notFound().
 async function getUser(username: string): Promise<UserData | null> {
-  try {
-    return await fetchJSON<UserData>(`/devs/${username}`, { cache: 'no-store' });
-  } catch {
-    return null;
-  }
+  return fetchJSON<UserData | null>(`/devs/${username}`, { cache: 'no-store' });
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

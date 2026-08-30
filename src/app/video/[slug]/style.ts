@@ -19,7 +19,7 @@ margin: 0 auto;
 }
 
 p {
-  color: ${props => props.theme.foregroundStronger}
+  color: var(--color-foreground-stronger)
 }
 
 .buttons {
@@ -33,7 +33,7 @@ p {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
   border: 0;
   border-radius: 4px;
-  background: ${props => props.theme.primaryStronger};
+  background: var(--color-primary-stronger);
   cursor: pointer;
   color: #fff;
   display: flex;

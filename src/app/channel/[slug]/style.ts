@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 const About = styled.ul`
-  background-color: ${props => props.theme.backgroundWeakerer};
-  border: 1px solid ${props => props.theme.backgroundWeakerer};
+  background-color: var(--color-background-weakerer);
+  border: 1px solid var(--color-background-weakerer);
   border-radius: 15px;
   margin-bottom: 48px;
 
@@ -27,7 +27,7 @@ li {
 h3 {
   font-size: 24px;
   font-weight: 400;
-  color: ${props => props.theme.foregroundStronger};
+  color: var(--color-foreground-stronger);
 }
 
 aside {
@@ -36,8 +36,6 @@ aside {
   justify-content: space-between;
   flex: 1;
   justify-content: center;
-  /*background-color: ${props => props.theme.backgroundWeakerer};
-    border: 1px solid ${props => props.theme.backgroundWeakerer};*/
   padding-left: 16px;
   text-align: left;
   border-radius: 0 0 5px 5px;
@@ -52,13 +50,13 @@ aside>div {
 
 aside strong {
   font-size: 16px;
-  color: ${props => props.theme.foregroundStronger};
+  color: var(--color-foreground-stronger);
 }
 
 aside p {
   font-size: 14px;
   line-height: 20px;
-  color: ${props => props.theme.foregroundStrong};
+  color: var(--color-foreground-strong);
   width: 100%;
 }
 
@@ -79,9 +77,9 @@ aside svg {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
   border: 0;
   border-radius: 4px;
-  background: ${props => props.theme.primaryStronger};
+  background: var(--color-primary-stronger);
   cursor: pointer;
-  color: ${props => props.theme.foregroundStronger};
+  color: var(--color-foreground-stronger);
   display: flex;
   align-items: center;
   justify-content: center;

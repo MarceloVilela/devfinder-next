@@ -1,57 +1,35 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 
 import { useAuth } from '../../hooks/auth';
-import api from '../../services/api';
 import LoginContainer from '../login/style';
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, socialAuthCallback, signOut, message, isHydrated } = useAuth();
+  const { user, signOut, message, isHydrated } = useAuth();
 
-  const loadProfile = useCallback(async function (token: string) {
-    try {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const { data: user } = await api.get('/me');
-
-      socialAuthCallback({ token, user });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(`Erro ao listar perfil - ${error.message}`);
-      }
-    }
-  }, [socialAuthCallback]);
-
-  useEffect(() => {
-    signOut();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    const token = searchParams?.get('token');
-
-    if (typeof token === 'string') {
-      loadProfile(token);
-      router.replace('/login');
-    }
-  }, [searchParams, router, loadProfile])
+  // O redirect de callback do GitHub já volta pra /login sem query string — o backend seta o
+  // cookie httpOnly de sessão direto na resposta do OAuth. A hidratação global (Providers/
+  // Hydrator, chamada em todo carregamento) já refaz GET /me e popula o user a partir do
+  // cookie; não há mais token pra ler da URL aqui.
 
   useEffect(() => {
     const logout = searchParams?.get('logout');
 
     if (logout) {
+      signOut();
       return;
     }
 
     if (isHydrated && user && Object.keys(user).includes('_id')) {
       router.push('/');
     }
-  }, [user, router, isHydrated, searchParams])
+  }, [user, router, isHydrated, searchParams, signOut])
 
   useEffect(() => {
     if (message) {

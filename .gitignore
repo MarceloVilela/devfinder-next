@@ -41,6 +41,9 @@ yarn-error.log*
 .env
 .env.local
 
+CLAUDE.local.md
+
+**__.**
 /md
 /src/pages/api/generate*.*
 client.http

@@ -8,16 +8,23 @@ import type { AppDispatch } from '../store';
 
 export type { UserData };
 
-export const hydrateAuth = () => (dispatch: AppDispatch) => {
+// Sessão vive só no cookie httpOnly do backend — nunca em localStorage/JS. Hidratar a sessão
+// é perguntar ao backend "quem sou eu" (o cookie vai junto sozinho); um 401 aqui só significa
+// visitante anônimo, não erro (ver isSessionCheck em services/api.ts).
+export const hydrateAuth = () => async (dispatch: AppDispatch) => {
   if (isServer()) return;
 
-  const token = localStorage.getItem('@DevFinder:token');
-  const user = localStorage.getItem('@DevFinder:user');
+  // Limpeza de migração: navegadores que logaram antes desta correção ainda têm o token da
+  // sessão antiga salvo aqui (o fluxo por ?token=/localStorage foi descontinuado, mas nada
+  // limpava o que já existia) — sem isso, o token velho continua exposto a XSS indefinidamente.
+  localStorage.removeItem('@DevFinder:token');
+  localStorage.removeItem('@DevFinder:user');
 
-  if (token && user) {
-    const userParsed = JSON.parse(user);
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    dispatch(authActions.setCredentials({ token, user: userParsed }));
+  try {
+    const { data: user } = await api.get<UserData>('/me');
+    dispatch(authActions.setUser(user));
+  } catch {
+    // visitante sem sessão — segue anônimo
   }
 
   dispatch(authActions.setHydrated(true));
@@ -27,30 +34,23 @@ function useAuth() {
   const dispatch = useAppDispatch();
   const { user, message, isHydrated } = useAppSelector((state) => state.auth);
 
-  const signOut = useCallback(() => {
+  const signOut = useCallback(async () => {
     if (isServer()) return;
 
-    localStorage.removeItem('@DevFinder:token');
-    localStorage.removeItem('@DevFinder:user');
+    // cookie é httpOnly, só o backend consegue limpar
+    await api.post('/auth/logout').catch(() => {});
 
     dispatch(authActions.signOut());
   }, [dispatch]);
 
-  const socialAuthCallback = useCallback(({ token, user }: { token: string; user: UserData }) => {
+  const socialAuthCallback = useCallback(({ user }: { user: UserData }) => {
     if (isServer()) return;
 
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-    localStorage.setItem('@DevFinder:token', token);
-    localStorage.setItem('@DevFinder:user', JSON.stringify(user));
-
-    dispatch(authActions.setCredentials({ token, user }));
+    dispatch(authActions.setUser(user));
   }, [dispatch]);
 
   const setUser = useCallback((user: UserData) => {
     if (isServer()) return;
-
-    localStorage.setItem('@DevFinder:user', JSON.stringify(user));
 
     dispatch(authActions.setUser(user));
   }, [dispatch]);

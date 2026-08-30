@@ -40,7 +40,7 @@ footer strong {
   line-height: 16px;
   max-height: 32px;
   overflow: hidden;
-  color: ${props => props.theme.foregroundStronger};
+  color: var(--color-foreground-stronger);
 }
 
 footer small {
@@ -50,7 +50,7 @@ footer small {
   line-height: 14px;
   max-height: 28px;
   overflow: hidden;
-  color: ${props => props.theme.foregroundStrong};
+  color: var(--color-foreground-strong);
 }
 
 &.placeholder .thumb {
