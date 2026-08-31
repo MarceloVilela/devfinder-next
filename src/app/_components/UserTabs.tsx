@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import * as Tabs from '@radix-ui/react-tabs';
 
 import { useAuth } from '../../hooks/auth';
 import { Container } from '../../components';
@@ -14,44 +14,38 @@ interface UserTabsProps {
 
 export default function UserTabs({ children }: UserTabsProps) {
   const { user, isHydrated } = useAuth();
+  const isLoggedIn = isHydrated && !!(user && user._id);
 
   return (
     <Container loading={false}>
+      {isHydrated &&
+        <Tabs.Root className="wrap-tabs-inline" defaultValue="start">
+          <Tabs.List className="tab-list">
+            <Tabs.Trigger className="tab-trigger" value="start">Início</Tabs.Trigger>
+            {isLoggedIn &&
+              <>
+                <Tabs.Trigger className="tab-trigger" value="liked">Favoritados</Tabs.Trigger>
+                <Tabs.Trigger className="tab-trigger" value="disliked">Não seguidos</Tabs.Trigger>
+              </>
+            }
+          </Tabs.List>
 
-      {isHydrated && (user && user._id) &&
-        <Tabs className='wrap-tabs-inline'>
-          <TabList>
-            <Tab>Início</Tab>
-            <Tab>Favoritados</Tab>
-            <Tab>Não seguidos</Tab>
-          </TabList>
-
-          <TabPanel>
+          <Tabs.Content value="start">
             {children}
-          </TabPanel>
+          </Tabs.Content>
 
-          <TabPanel>
-            <UserLiked />
-          </TabPanel>
-
-          <TabPanel>
-            <UserDisliked />
-          </TabPanel>
-        </Tabs>
+          {isLoggedIn &&
+            <>
+              <Tabs.Content value="liked">
+                <UserLiked />
+              </Tabs.Content>
+              <Tabs.Content value="disliked">
+                <UserDisliked />
+              </Tabs.Content>
+            </>
+          }
+        </Tabs.Root>
       }
-
-      {isHydrated && (!user || !user._id) &&
-        <Tabs className='wrap-tabs-inline'>
-          <TabList>
-            <Tab>Início</Tab>
-          </TabList>
-
-          <TabPanel>
-            {children}
-          </TabPanel>
-        </Tabs>
-      }
-
     </Container>
   );
 }

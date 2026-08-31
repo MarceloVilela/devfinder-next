@@ -32,7 +32,14 @@ const Footer: React.FC = () => {
           </a>
         </div>
         <div>
-          <p onClick={() => switchAlias()}>Tema {alias}</p>
+          <button
+            type="button"
+            onClick={() => switchAlias()}
+            aria-pressed={alias === 'dark'}
+            aria-label={`Alternar tema, atual: ${alias === 'dark' ? 'escuro' : 'claro'}`}
+          >
+            Tema {alias}
+          </button>
         </div>
       </div>
     </Wrapper>

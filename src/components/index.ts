@@ -1,3 +1,4 @@
+import CardSkeleton from './CardSkeleton'
 import ChannelItem from './ChannelItem'
 import Container from './Container'
 import Footer from './Footer'
@@ -8,12 +9,13 @@ import UserItem from './UserItem'
 import VideoThumbItem from './VideoThumbItem'
 
 export {
+  CardSkeleton,
   ChannelItem,
-  Container, 
+  Container,
   Footer,
-  IconCategory, 
-  Header, 
-  Paginate, 
-  UserItem, 
+  IconCategory,
+  Header,
+  Paginate,
+  UserItem,
   VideoThumbItem
 }

@@ -50,16 +50,16 @@ nav a > div {
 }
 
 nav a div {
-  background-color: ${props => props.theme.background};
-  color: ${props => props.theme.primary};
-  outline-color: ${props => props.theme.primary};
-  border-color: ${props => props.theme.primary};
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  outline-color: var(--color-primary);
+  border-color: var(--color-primary);
 
   text-align: left;
 
   &:hover {
-    outline-color: ${props => props.theme.primary};
-    border-color: ${props => props.theme.primary};
+    outline-color: var(--color-primary);
+    border-color: var(--color-primary);
   }
 }
 
@@ -86,7 +86,7 @@ section nav svg {
   font-size: 1.5em;
   text-align: center;
 
-  color: ${props => props.theme.primary};
+  color: var(--color-primary);
 }
 
 @media (max-width: 1024px) {

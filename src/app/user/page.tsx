@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 
 import { fetchJSON } from '../../lib/fetchJSON';
 import { UserData } from '../../hooks/auth';
-import { Header, Footer } from '../../components';
 import UserTabs from '../_components/UserTabs';
 import UserAll from '../_components/UserAll';
 
@@ -29,12 +28,8 @@ export default async function UserListPage({ searchParams }: PageProps) {
   });
 
   return (
-    <>
-      <Header />
-      <UserTabs>
-        <UserAll docsStatic={docs} totalStatic={total} itemsPerPageStatic={itemsPerPage} page={currentPage} />
-      </UserTabs>
-      <Footer />
-    </>
+    <UserTabs>
+      <UserAll docsStatic={docs} totalStatic={total} itemsPerPageStatic={itemsPerPage} page={currentPage} />
+    </UserTabs>
   );
 }

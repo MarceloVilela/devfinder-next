@@ -4,9 +4,10 @@ import React, { useEffect, useState } from 'react'
 
 import api from '../../services/api'
 import { useAuth } from '../../hooks/auth';
-import { Paginate, VideoThumbItem, Container } from '../../components'
+import { CardSkeleton, Paginate, VideoThumbItem, Container } from '../../components'
 import { VideoData } from '../../types'
 import { VideoList } from '../video/style'
+import { makePlaceholders } from '../../utils'
 
 const Subs = () => {
   const { user } = useAuth();
@@ -25,7 +26,7 @@ const Subs = () => {
     async function loadDocs() {
       try {
         setLoading(true)
-        setDocs(Array.from(Array(30)).map(item => ({} as VideoData)))
+        setDocs(makePlaceholders<VideoData>(30))
 
         const { data } = await api.get('/feed/subscriptions', { params: { page } })
         setDocs(data.docs)
@@ -42,18 +43,16 @@ const Subs = () => {
 
   return (
     <Container loading={false} unstylized className='container-full-width'>
-      <>
-
+      <CardSkeleton loading={loading} loadingLabel="Carregando inscrições...">
         <VideoList className="subs list-flex-column">
           {docs.map((item, key) => (
             <VideoThumbItem key={key} video={item} placeholder={loading} />
           ))}
         </VideoList>
-        {!loading &&
-          <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} handlePaginate={setPage} />
-        }
-
-      </>
+      </CardSkeleton>
+      {!loading &&
+        <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} handlePaginate={setPage} />
+      }
     </Container>
   )
 }

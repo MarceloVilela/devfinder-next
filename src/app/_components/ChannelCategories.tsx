@@ -1,9 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, Fragment } from 'react'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-// @ts-ignore
-import 'react-tabs/style/react-tabs.css';
+import React, { useState, useMemo } from 'react'
 
 import { useAuth } from '../../hooks/auth';
 import { Container, ChannelItem } from '../../components'
@@ -14,10 +11,6 @@ interface ChannelsGroupedByCategory {
   [key: string]: ChannelData[];
 }
 
-interface CategoryCounter {
-  [key: string]: number;
-}
-
 interface ChannelCategoriesProps {
   channelsStatic: ChannelData[];
 }
@@ -25,7 +18,7 @@ interface ChannelCategoriesProps {
 export default function ChannelCategories({ channelsStatic }: ChannelCategoriesProps) {
   const { user, isHydrated } = useAuth();
 
-  const [tabIndex, setTabIndex] = useState(0);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const channels = channelsStatic;
 
   const channelsCategorized = useMemo(() => {
@@ -52,43 +45,28 @@ export default function ChannelCategories({ channelsStatic }: ChannelCategoriesP
     return Object.keys(channelsCategorized)
   }, [channelsCategorized])
 
-  const categoryCount = useMemo(() => {
-    let data = {} as CategoryCounter;
-    Object.keys(channelsCategorized).forEach(categoryName => {
-      data[categoryName] = channelsCategorized[categoryName].length
-    })
-    return data;
-  }, [channelsCategorized])
+  const activeCategory = categories[activeCategoryIndex] ?? categories[0];
 
   return (
     <Container loading={false}>
       <ChannelContainer>
 
         <section>
-          <select onChange={(e) => setTabIndex(Number(e.target.value))}>
+          <select
+            aria-label="Filtrar canais por categoria"
+            value={activeCategoryIndex}
+            onChange={(e) => setActiveCategoryIndex(Number(e.target.value))}
+          >
             {categories?.map((name, key) => (
               <option key={key} value={key}>{name}</option>
             ))}
           </select>
 
-          <Tabs selectedIndex={tabIndex} onSelect={index => setTabIndex(index)}>
-
-            <TabList>
-              {categories?.map(name => (
-                <Tab key={name}>{name}({categoryCount[name]})</Tab>
-              ))}
-            </TabList>
-
-            {categories?.map(name => (
-              <TabPanel key={name}>
-                <ul className='channels list-flex-row'>
-                  {channelsCategorized[name]?.map((item) => (
-                    <ChannelItem item={item} placeholder={false} key={item._id} />
-                  ))}
-                </ul>
-              </TabPanel>
+          <ul className='channels list-flex-row'>
+            {channelsCategorized[activeCategory]?.map((item) => (
+              <ChannelItem item={item} placeholder={false} key={item._id} />
             ))}
-          </Tabs>
+          </ul>
         </section>
       </ChannelContainer>
     </Container>

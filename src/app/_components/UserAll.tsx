@@ -19,7 +19,7 @@ function UserAll({ docsStatic, totalStatic, itemsPerPageStatic, page }: UserAllP
       <UsersList className="users list-flex-row">
         {docsStatic.map((user) => (
           <UserItem key={user._id} user={user} placeholder={false}>
-            <UserLikeButtons username={user.user} />
+            <UserLikeButtons userId={user._id} username={user.user} />
           </UserItem>
         ))}
       </UsersList>
