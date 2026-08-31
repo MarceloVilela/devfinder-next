@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 import styled from 'styled-components'
 
 import api from '../../../services/api'
-import { Header, Container, Footer } from '../../../components'
+import { Container } from '../../../components'
 
 type DataRefresh = {
   errors: any[]
@@ -212,79 +212,75 @@ export default function Refresh() {
   }
 
   return (
-    <>
-      <Header />
-      <Container loading={false}>
-        <Page>
-          <ButtonRow>
-            <ActionButton
-              onClick={() => {
-                wakeFinder()
-                wakeAuto()
-              }}
-            >
-              WAKE
-            </ActionButton>
-            <ActionButton onClick={handleGetFeedSubs}>FEED SUBS</ActionButton>
-            <ActionButton onClick={handleGetFeedAsJson}>
-              FEED AS JSON
-            </ActionButton>
-            <ActionButton onClick={handleRefreshFinder}>REFRESH</ActionButton>
-            <ActionButton onClick={handleGenerateContent}>CONTENT</ActionButton>
-            <ActionButton onClick={handleDownloadScreenshots}>
-              DOWN
-            </ActionButton>
-          </ButtonRow>
+    <Container loading={false}>
+      <Page>
+        <ButtonRow>
+          <ActionButton
+            onClick={() => {
+              wakeFinder()
+              wakeAuto()
+            }}
+          >
+            WAKE
+          </ActionButton>
+          <ActionButton onClick={handleGetFeedSubs}>FEED SUBS</ActionButton>
+          <ActionButton onClick={handleGetFeedAsJson}>
+            FEED AS JSON
+          </ActionButton>
+          <ActionButton onClick={handleRefreshFinder}>REFRESH</ActionButton>
+          <ActionButton onClick={handleGenerateContent}>CONTENT</ActionButton>
+          <ActionButton onClick={handleDownloadScreenshots}>
+            DOWN
+          </ActionButton>
+        </ButtonRow>
 
-          <div>
-            {screenshots.length > 0 && (
-              <ScreenshotRow>
-                {screenshots.map((source) => (
-                  <ScreenshotItem key={source}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- host dinâmico via NEXT_PUBLIC_API_AUTO, não dá para whitelisting em next.config.js */}
-                    <img src={source} alt="screenshot" />
-                    <p>{source}</p>
-                  </ScreenshotItem>
-                ))}
-              </ScreenshotRow>
-            )}
-
-            {description && (
-              <PreContainer>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-                <p>/v1/description/feed</p>
-              </PreContainer>
-            )}
-          </div>
-
-          {(dataRefresh.errors ||
-            dataRefresh.videosAdded ||
-            dataRefresh.videosFounded) && (
-            <PreContainer>
-              <pre style={{ textAlign: 'left' }}>
-                {JSON.stringify(dataRefresh, null, 2)}
-              </pre>
-              <p>/v1/video/refresh</p>
-            </PreContainer>
+        <div>
+          {screenshots.length > 0 && (
+            <ScreenshotRow>
+              {screenshots.map((source) => (
+                <ScreenshotItem key={source}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- host dinâmico via NEXT_PUBLIC_API_AUTO, não dá para whitelisting em next.config.js */}
+                  <img src={source} alt="screenshot" />
+                  <p>{source}</p>
+                </ScreenshotItem>
+              ))}
+            </ScreenshotRow>
           )}
 
-          {dataFeed.length > 0 && (
+          {description && (
             <PreContainer>
-              <pre style={{ textAlign: 'left' }}>
-                {JSON.stringify(dataFeed, null, 2)}
-              </pre>
-              <p>
-                {'https://api.jsonbin.io/v3/b/' +
-                  process.env.NEXT_PUBLIC_JSONBIN_ID_CHANNEL}
-              </p>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+              <p>/v1/description/feed</p>
             </PreContainer>
           )}
-        </Page>
-      </Container>
-      <Footer />
-    </>
+        </div>
+
+        {(dataRefresh.errors ||
+          dataRefresh.videosAdded ||
+          dataRefresh.videosFounded) && (
+          <PreContainer>
+            <pre style={{ textAlign: 'left' }}>
+              {JSON.stringify(dataRefresh, null, 2)}
+            </pre>
+            <p>/v1/video/refresh</p>
+          </PreContainer>
+        )}
+
+        {dataFeed.length > 0 && (
+          <PreContainer>
+            <pre style={{ textAlign: 'left' }}>
+              {JSON.stringify(dataFeed, null, 2)}
+            </pre>
+            <p>
+              {'https://api.jsonbin.io/v3/b/' +
+                process.env.NEXT_PUBLIC_JSONBIN_ID_CHANNEL}
+            </p>
+          </PreContainer>
+        )}
+      </Page>
+    </Container>
   )
 }

@@ -11,7 +11,7 @@ const LoginContainer = styled.div`
 .logo {
     font-family: 'Grenze Gotisch', cursive;
     text-align: center;
-    color: ${props => props.theme.primary};
+    color: var(--color-primary);
 }
 
 form {

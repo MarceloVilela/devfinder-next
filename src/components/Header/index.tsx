@@ -13,8 +13,13 @@ import {
   FaUserCircle
 } from 'react-icons/fa';
 import { ActionMeta, GetOptionLabel, SingleValue } from 'react-select';
-const AsyncSelect = dynamic(() => import("react-select/async"), { ssr: false, });
-//mport AsyncSelect from 'react-select/async';
+// ssr:false porque react-select gera ids aleatórios que dão mismatch de hidratação — o
+// `loading` abaixo ocupa o mesmo espaço (mesmo seletor CSS `section > div`) antes do chunk
+// carregar, pra não sumir/dar flick na barra de busca (só falta a interatividade por um instante).
+const AsyncSelect = dynamic(() => import("react-select/async"), {
+  ssr: false,
+  loading: () => <div aria-hidden="true" />,
+});
 
 import Wrapper from './style'
 import api from '../../services/api';

@@ -1,21 +1,34 @@
 import { createGlobalStyle } from 'styled-components'
+import { night, day } from './Theme'
 
 export default createGlobalStyle`
 /* Variáveis de CSS espelhando o Theme — necessário porque Server Components não conseguem ler
    o Context do ThemeProvider (limitação do React, não bug: Context nunca atravessa a fronteira
    Server/Client, mesmo com o Provider mais acima na árvore). Styled-components usados dentro de
-   Server Components leem essas variáveis em vez de props.theme.*; GlobalStyle roda dentro do
-   ThemeProvider (Client) e é a única fonte de verdade que ainda lê o tema via prop diretamente. */
+   Server E Client Components leem essas variáveis em vez de props.theme.* — por isso os valores
+   abaixo são estáticos (não vêm de props.theme), presentes desde o primeiro HTML enviado pelo
+   servidor. Quem decide qual regra vale é o atributo data-theme no <html>, escrito por um script
+   bloqueante em app/layout.tsx antes do primeiro paint (ver Ponto 3 do plano de UI/UX) — não o
+   ThemeProvider, que hidrata depois. Isso elimina o flash de tema incorreto no primeiro paint. */
 :root {
-  --color-primary: ${props => props.theme.primary};
-  --color-primary-strong: ${props => props.theme.primaryStrong};
-  --color-primary-stronger: ${props => props.theme.primaryStronger};
-  --color-background-weakerer: ${props => props.theme.backgroundWeakerer};
-  --color-background-weak: ${props => props.theme.backgroundWeak};
-  --color-background: ${props => props.theme.background};
-  --color-foreground: ${props => props.theme.foreground};
-  --color-foreground-strong: ${props => props.theme.foregroundStrong};
-  --color-foreground-stronger: ${props => props.theme.foregroundStronger};
+  --color-primary: ${night.primary};
+  --color-primary-strong: ${night.primaryStrong};
+  --color-primary-stronger: ${night.primaryStronger};
+  --color-background-weakerer: ${night.backgroundWeakerer};
+  --color-background-weak: ${night.backgroundWeak};
+  --color-background: ${night.background};
+  --color-foreground: ${night.foreground};
+  --color-foreground-strong: ${night.foregroundStrong};
+  --color-foreground-stronger: ${night.foregroundStronger};
+}
+
+:root[data-theme='light'] {
+  --color-background-weakerer: ${day.backgroundWeakerer};
+  --color-background-weak: ${day.backgroundWeak};
+  --color-background: ${day.background};
+  --color-foreground: ${day.foreground};
+  --color-foreground-strong: ${day.foregroundStrong};
+  --color-foreground-stronger: ${day.foregroundStronger};
 }
 
 * {
@@ -30,7 +43,7 @@ html, body, #root, #__next {
 }
 
 body {
-  background: ${props => props.theme.background};
+  background: var(--color-background);
 }
 
 body, input, button {
@@ -81,16 +94,16 @@ main {
   /*border: 1px solid #ccc;*/
 }
 
-.wrap-tabs-inline .react-tabs__tab-list {
+.wrap-tabs-inline .tab-list {
   display: flex;
   border: 0;
 
   list-style: none;
 }
 
-.wrap-tabs-inline .react-tabs__tab {
+.wrap-tabs-inline .tab-trigger {
   background: inherit;
-  color: ${props => props.theme.primaryStronger};
+  color: var(--color-primary-stronger);
   border-radius: 0;
   border: 0;
 
@@ -98,7 +111,7 @@ main {
   cursor: pointer;
 }
 
-.wrap-tabs-inline .react-tabs__tab--selected {
-  color: ${props => props.theme.primaryStrong};
-  border-bottom: 2px solid ${props => props.theme.primaryStrong};
+.wrap-tabs-inline .tab-trigger[data-state='active'] {
+  color: var(--color-primary-strong);
+  border-bottom: 2px solid var(--color-primary-strong);
 }`;

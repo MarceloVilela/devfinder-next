@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FaYoutube, FaHome } from 'react-icons/fa';
 
 import { fetchJSON } from '../../../lib/fetchJSON';
-import { Header, Container, Footer } from '../../../components';
+import { Container } from '../../../components';
 import { VideoData } from '../../../types';
 import About from './style';
 
@@ -39,48 +39,42 @@ export default async function VideoDetail({ params }: PageProps) {
   }
 
   return (
-    <>
-      <Header />
+    <Container loading={false} className="containerVerticalCenter">
+      <About>
+        <Image
+          className="thumb"
+          src={video.thumbnail}
+          alt={video.title}
+          width={480}
+          height={360}
+          style={{ width: '270px', height: 'auto' }}
+        />
 
-      <Container loading={false} className="containerVerticalCenter">
-        <About>
-          <Image
-            className="thumb"
-            src={video.thumbnail}
-            alt={video.title}
-            width={480}
-            height={360}
-            style={{ width: '270px', height: 'auto' }}
-          />
+        <p>{video.title}</p>
 
-          <p>{video.title}</p>
+        <div className="buttons">
+          <a
+            href={video.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <button style={{ backgroundColor: "#ff0000" }}>
+              <span>Acessar</span>
+              <FaYoutube />
+            </button>
+          </a>
 
-          <div className="buttons">
-            <a
-              href={video.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button style={{ backgroundColor: "#ff0000" }}>
-                <span>Acessar</span>
-                <FaYoutube />
-              </button>
-            </a>
-
-            <a
-              href={'/'}
-              rel="noopener noreferrer"
-            >
-              <button>
-                <span>Listar outros</span>
-                <FaHome />
-              </button>
-            </a>
-          </div>
-        </About>
-      </Container>
-
-      <Footer />
-    </>
+          <a
+            href={'/'}
+            rel="noopener noreferrer"
+          >
+            <button>
+              <span>Listar outros</span>
+              <FaHome />
+            </button>
+          </a>
+        </div>
+      </About>
+    </Container>
   );
 }

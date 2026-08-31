@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 
 import { fetchJSON } from '../../lib/fetchJSON';
 import { ChannelData } from '../../types';
-import { Header, Footer } from '../../components';
 import ChannelCategories from '../_components/ChannelCategories';
 
 export const metadata: Metadata = {
@@ -14,11 +13,5 @@ export default async function ChannelListPage() {
     next: { revalidate: 60 * 60 * 8 },
   });
 
-  return (
-    <>
-      <Header />
-      <ChannelCategories channelsStatic={channels} />
-      <Footer />
-    </>
-  );
+  return <ChannelCategories channelsStatic={channels} />;
 }

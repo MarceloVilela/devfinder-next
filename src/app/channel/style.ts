@@ -35,33 +35,6 @@ select {
   color: #9373d8;
 }
 
-.react-tabs__tab-list {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 0.5rem;
-  border: 0;
-  display: none;
-}
-
-.react-tabs__tab {
-  background: inherit;
-  color: #999;
-  border-radius: 0;
-  border: 0;
-  /**/
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #666;
-  border-radius: 8px;
-  height: 50px;
-}
-
-.react-tabs__tab--selected {
-  color: #FFF;
-  border: 2px solid #9373d8;
-}
-
 .categories {
   display: grid;
   grid-template-columns: repeat(auto-fill, 96px);

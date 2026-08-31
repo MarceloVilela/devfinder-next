@@ -11,12 +11,12 @@ const ContainerFullWidth = styled(Container)`
       padding-right: 0;
     }
 
-    .container-edge-spacing, .react-tabs__tab-list, .paginate {
+    .container-edge-spacing, .tab-list, .paginate {
       padding-left: 16px;
       padding-right: 16px;
     }
 
-    .react-tabs__tab-list {
+    .tab-list {
       margin-bottom: 0;
     }
   }

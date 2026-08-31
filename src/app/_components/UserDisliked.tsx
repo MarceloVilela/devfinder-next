@@ -6,9 +6,9 @@ import { MdSyncDisabled } from 'react-icons/md'
 
 import api from '../../services/api'
 import { useAuth, UserData } from '../../hooks/auth'
-import { Container, UserItem } from '../../components'
+import { CardSkeleton, Container, UserItem } from '../../components'
 import UsersList from '../user/style'
-import { getErrorMessage } from '../../utils'
+import { getErrorMessage, makePlaceholders } from '../../utils'
 
 function UserDisliked() {
   const { user } = useAuth();
@@ -20,7 +20,7 @@ function UserDisliked() {
     async function loaddocs() {
       try {
         setLoading(true)
-        setDocs(Array.from(Array(50)).map(item => ({} as UserData)))
+        setDocs(makePlaceholders<UserData>(50))
 
         const { data } = await api.get('/dislikes/devs')
         setDocs(data)
@@ -46,17 +46,19 @@ function UserDisliked() {
 
   return (
     <Container loading={false} unstylized className="container-full-width">
-      <UsersList className="users list-flex-row">
-        {docs.map((user, key) => (
-          <UserItem key={key} user={user} placeholder={loading}>
-            <div className='buttons single'>
-              <button type='button' onClick={() => handleUndoDislike(user.user)}>
-                <MdSyncDisabled />Desmarcar
-              </button>
-            </div>
-          </UserItem>
-        ))}
-      </UsersList>
+      <CardSkeleton loading={loading} loadingLabel="Carregando não seguidos...">
+        <UsersList className="users list-flex-row">
+          {docs.map((user, key) => (
+            <UserItem key={key} user={user} placeholder={loading}>
+              <div className='buttons single'>
+                <button type='button' onClick={() => handleUndoDislike(user.user)}>
+                  <MdSyncDisabled aria-hidden="true" />Desmarcar
+                </button>
+              </div>
+            </UserItem>
+          ))}
+        </UsersList>
+      </CardSkeleton>
     </Container>
   )
 }

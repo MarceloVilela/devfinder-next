@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 
 import { fetchJSON } from '../../../lib/fetchJSON';
-import { Header, Container, Footer } from '../../../components';
+import { Container } from '../../../components';
 import { ChannelData, VideoData } from '../../../types';
 import About from './style';
 import ChannelLikeButtons from '../../_components/ChannelLikeButtons';
@@ -60,69 +60,63 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
   const { docs, total, itemsPerPage } = await getChannelFeed(channel.name, currentPage);
 
   return (
-    <>
-      <Header />
+    <Container loading={false} className="containerVerticalCenter">
+      <About>
+        <li key={channel._id}>
+          <div className="avatar">
+            <Image
+              src={channel.avatar ? channel.avatar : 'https://yt3.ggpht.com/a/AATXAJzF6fuUyEFRBtZSpScb9M-Dq4QI6pyv0ic3pw=s100-c-k-c0xffffffff-no-rj-mo'}
+              alt={channel.name}
+              width={100}
+              height={100}
+            />
+          </div>
 
-      <Container loading={false} className="containerVerticalCenter">
-        <About>
-          <li key={channel._id}>
-            <div className="avatar">
-              <Image
-                src={channel.avatar ? channel.avatar : 'https://yt3.ggpht.com/a/AATXAJzF6fuUyEFRBtZSpScb9M-Dq4QI6pyv0ic3pw=s100-c-k-c0xffffffff-no-rj-mo'}
-                alt={channel.name}
-                width={100}
-                height={100}
-              />
+          <aside>
+            <h3>{channel.name}</h3>
+
+            <div>
+              <strong>Tags</strong>
+              <p>{channel.tags.join(", ")}</p>
             </div>
 
-            <aside>
-              <h3>{channel.name}</h3>
+            <div>
+              <strong>Sobre</strong>
+              <p>{channel.description}</p>
+              <p></p>
 
-              <div>
-                <strong>Tags</strong>
-                <p>{channel.tags.join(", ")}</p>
-              </div>
+              <ChannelLikeButtons channelId={channel._id} channelName={channel.name} />
+            </div>
 
-              <div>
-                <strong>Sobre</strong>
-                <p>{channel.description}</p>
-                <p></p>
-
-                <ChannelLikeButtons channelId={channel._id} channelName={channel.name} />
-              </div>
-
-              <div>
-                <strong>Acessar</strong>
+            <div>
+              <strong>Acessar</strong>
+              <a
+                href={channel.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaYoutube color="#ff0000" />
+              </a>
+              {channel.userGithub &&
                 <a
-                  href={channel.link}
+                  href={`https://github.com/${channel.userGithub}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaYoutube color="#ff0000" />
+                  <FaGithub color="#fff" />
                 </a>
-                {channel.userGithub &&
-                  <a
-                    href={`https://github.com/${channel.userGithub}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaGithub color="#fff" />
-                  </a>
-                }
-              </div>
-            </aside>
-          </li>
-        </About>
+              }
+            </div>
+          </aside>
+        </li>
+      </About>
 
-        <ChannelVideoFeed
-          docsStatic={docs}
-          totalStatic={total}
-          itemsPerPageStatic={itemsPerPage}
-          page={currentPage}
-        />
-      </Container>
-
-      <Footer />
-    </>
+      <ChannelVideoFeed
+        docsStatic={docs}
+        totalStatic={total}
+        itemsPerPageStatic={itemsPerPage}
+        page={currentPage}
+      />
+    </Container>
   );
 }

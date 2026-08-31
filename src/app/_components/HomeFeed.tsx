@@ -1,12 +1,9 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-// @ts-ignore
-import 'react-tabs/style/react-tabs.css';
+import * as Tabs from '@radix-ui/react-tabs';
 
 import { useAuth } from '../../hooks/auth';
-import { Footer, Header } from '../../components';
 import Subs from './Subs';
 import ContainerFullWidth from '../video/style';
 
@@ -16,32 +13,27 @@ interface HomeFeedProps {
 
 export default function HomeFeed({ children }: HomeFeedProps) {
   const { user, isHydrated } = useAuth();
+  const hasSubscriptionsTab = isHydrated && !!(user && user._id);
 
   return (
-    <>
-      <Header />
-
-      <ContainerFullWidth className="container-full-width" loading={false}>
-        <Tabs className='wrap-tabs-inline'>
-          <TabList>
-            <Tab>Explorar</Tab>
-            {isHydrated && (user && user._id) &&
-              <Tab>Inscrições</Tab>
-            }
-          </TabList>
-
-          <TabPanel>
-            {children}
-          </TabPanel>
-          {isHydrated && (user && user._id) &&
-            <TabPanel>
-              <Subs />
-            </TabPanel>
+    <ContainerFullWidth className="container-full-width" loading={false}>
+      <Tabs.Root className="wrap-tabs-inline" defaultValue="explore">
+        <Tabs.List className="tab-list">
+          <Tabs.Trigger className="tab-trigger" value="explore">Explorar</Tabs.Trigger>
+          {hasSubscriptionsTab &&
+            <Tabs.Trigger className="tab-trigger" value="subs">Inscrições</Tabs.Trigger>
           }
-        </Tabs>
-      </ContainerFullWidth>
+        </Tabs.List>
 
-      <Footer />
-    </>
+        <Tabs.Content value="explore">
+          {children}
+        </Tabs.Content>
+        {hasSubscriptionsTab &&
+          <Tabs.Content value="subs">
+            <Subs />
+          </Tabs.Content>
+        }
+      </Tabs.Root>
+    </ContainerFullWidth>
   );
 }

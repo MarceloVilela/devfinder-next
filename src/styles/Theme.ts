@@ -33,7 +33,8 @@ export const day = {
     /*background*/
     background: '#fff',
 
-    foreground: '#999',
+    /* #767676 sobre #fff ≈ 4,54:1 — passa WCAG AA (4.5:1) para texto normal; #999 dava ≈ 2,85:1 */
+    foreground: '#767676',
     /*primary-strong*/
     foregroundStrong: '#555',
     /*primary-stronger*/

@@ -4,9 +4,16 @@ const Wrapper = styled.footer`
 background: #222;
 color: #ccc;
 
-a, p {
+a, button {
   color: #ccc;
   cursor: pointer;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
 }
 
 a + a{

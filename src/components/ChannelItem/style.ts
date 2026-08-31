@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const ChannelThumb = styled.li`
 &.card {
-  background: ${props => props.theme.backgroundWeakerer};
+  background: var(--color-background-weakerer);
   border-radius: 8px;
 }
 
@@ -44,12 +44,12 @@ aside {
 
 aside strong {
   font-size: 16px;
-  color: ${props => props.theme.foregroundStronger};
+  color: var(--color-foreground-stronger);
 }
 
 aside small {
   font-size: 14px;
-  color: ${props => props.theme.foregroundStrong};
+  color: var(--color-foreground-strong);
   margin-top: 5px;
   line-height: 20px;
   height: 40px;
