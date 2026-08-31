@@ -6,9 +6,10 @@ describe('handleResponseError', () => {
   beforeEach(() => {
     // jsdom não implementa navegação real; sem isto o teste loga
     // "Not implemented: navigation" ao atribuir window.location.href
-    // @ts-expect-error - jsdom location mock
-    delete window.location
-    window.location = { href: '/user/octocat' } as Location
+    delete (window as unknown as { location?: Location }).location
+    ;(window as unknown as { location: Location }).location = {
+      href: '/user/octocat',
+    } as Location
   })
 
   it('rejeita a promise em 401 (regressão do bug do item #3)', async () => {

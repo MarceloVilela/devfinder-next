@@ -20,12 +20,15 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsc --noEmit
       - run: pnpm lint
       - run: pnpm test
 
-# "pnpm build" fica fora do gate de PR de propósito: "/", "/user" e "/channel" usam
-# getStaticProps chamando NEXT_PUBLIC_API_URL diretamente, sem fallback — o build só passa com
-# um backend real e acessível no ar (verificado localmente com devfinder-api rodando). Não há
-# hoje uma URL pública estável do backend para apontar o CI (as opções antigas em .env.example
-# — herokuapp.com, onrender.com — não respondem mais). Gatear o PR nisso tornaria o CI refém da
+# "pnpm build" fica fora do gate de PR de propósito: as páginas de listagem ("/", "/user",
+# "/channel", "/video") são Server Components que buscam com `fetch(..., { next: { revalidate }
+# })` direto em NEXT_PUBLIC_API_URL (App Router, não mais getStaticProps do Pages Router) — o
+# `next build` ainda executa esse fetch em build-time por causa do ISR, então só passa com um
+# backend real e acessível no ar (verificado localmente com devfinder-api rodando). Não há hoje
+# uma URL pública estável do backend para apontar o CI (as opções antigas em .env.example —
+# herokuapp.com, onrender.com — não respondem mais). Gatear o PR nisso tornaria o CI refém da
 # disponibilidade de um serviço externo fora do controle deste repositório.
