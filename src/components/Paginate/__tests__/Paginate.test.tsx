@@ -42,6 +42,14 @@ describe('Paginate', () => {
     expect(push).toHaveBeenCalledWith('/user?tab=liked&page=2')
   })
 
+  it('navega via pageParam customizado quando informado (evita colisão entre listagens paginadas na mesma rota)', () => {
+    render(<Paginate page={1} totalItems={100} itemsPerPage={30} pageParam="subsPage" />)
+
+    fireEvent.click(screen.getByText('2'))
+
+    expect(push).toHaveBeenCalledWith('/user?subsPage=2')
+  })
+
   it('usa o callback local em vez de navegar quando handlePaginate é passado', () => {
     const handlePaginate = jest.fn()
     render(

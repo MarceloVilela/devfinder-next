@@ -47,7 +47,12 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
     a lógica em si (dashboard de ações manuais) é `_components/RefreshClient.tsx`.
     `video/refresh` é ferramenta operacional de uso interno (disparar reprocessamento do feed),
     não faz parte do produto público e não é linkada a partir de nenhuma navegação visível
-  - `_components/` — Client Components (`'use client'`) usados como filhos das rotas Server: paginação, abas, botões de like/dislike/undo, formulário de login, dashboard de `video/refresh`
+  - `_components/` — filhos das rotas Server, mistura Server e Client Component conforme
+    precisa de interatividade ou não: `UserLiked`/`UserDisliked`/`Subs` (dado por sessão) são
+    Server Component, igual às listagens/detalhe públicos; `UserTabs`/`HomeFeed` (abas Radix),
+    `UndoableUserCard` (botão "Desmarcar"), `ChannelLikeButtons`/`UserLikeButtons`, formulário
+    de login e dashboard de `video/refresh` são `'use client'` — só a folha interativa, nunca a
+    árvore de busca de dado (ver "Regra de renderização" abaixo)
 - `pages/api/` — Route Handlers legados (Pages API routes: `hello`, `jsonbin`, `video-refresh`) — coexistem com `app/` sem conflito
 - `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate, IconCategory); exportados via `components/index.ts`. Header/Footer/Paginate/IconCategory são `'use client'` (hooks/estado)
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
@@ -59,12 +64,16 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
 
 ### Regra de renderização
 
-SSR/ISR para **todas** as rotas de dado público — listagem (N registros) e detalhe (1 registro):
-ambas viram Server Component. A distinção real é **dado público vs. dado que depende da sessão do
-usuário logado** — este último (`Liked`/`Disliked`/`Subs`, dentro de `_components/`) continua
-Client Component porque a sessão vive em `localStorage`, inacessível a um Server Component sem
-cookie `httpOnly` (mudança de backend, ainda não feita). Detalhe completo em
-`../reactjs/improvements/devfinder-next-app-router-migration.md`.
+SSR/ISR para **todas** as rotas — listagem (N registros), detalhe (1 registro) **e** as telas
+que dependem da sessão do usuário logado (favoritos, não seguidos, inscrições). A sessão vive
+num cookie `httpOnly` setado pelo backend; o Server Component lê esse cookie via `next/headers`
+(`cookies()`, `lib/fetchSessionJSON.ts`) e o reenvia manualmente no `fetch` pro backend — o
+`fetch` nativo do servidor não herda cookies do navegador automaticamente. Só a interatividade em
+si (toggle de like/dislike, botão de desmarcar, paginação) fica em Client Components na folha da
+árvore — a busca de dado, incluindo a personalizada, é Server Component. Detalhe completo em
+`../reactjs/improvements/devfinder-next-app-router-migration.md` (estado anterior a esta
+migração) e `../reactjs/improvements/v3/devfinder-next/2-debito-arquitetural.md` (M1, a
+migração em si).
 
 ### Estilização
 

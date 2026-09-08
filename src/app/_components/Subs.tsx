@@ -1,60 +1,51 @@
-'use client';
+import { CardSkeleton, Container, Paginate, VideoThumbItem } from '../../components';
+import { VideoData } from '../../types';
+import { VideoList } from '../video/style';
+import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
+import { resolveSessionSection } from './sessionFetch';
+import { makePlaceholders } from '../../utils';
 
-import React, { useEffect, useState } from 'react'
+interface SubsFeed {
+  docs: VideoData[];
+  total: number;
+  itemsPerPage: number;
+}
 
-import api from '../../services/api'
-import { useAuth } from '../../hooks/auth';
-import { CardSkeleton, Paginate, VideoThumbItem, Container } from '../../components'
-import { VideoData } from '../../types'
-import { VideoList } from '../video/style'
-import { makePlaceholders } from '../../utils'
+interface SubsProps {
+  token: string;
+  page: number;
+}
 
-const Subs = () => {
-  const { user } = useAuth();
-
-  const [loading, setLoading] = useState(false)
-  const [docs, setDocs] = useState<VideoData[]>([] as VideoData[])
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(0);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    async function loadDocs() {
-      try {
-        setLoading(true)
-        setDocs(makePlaceholders<VideoData>(30))
-
-        const { data } = await api.get('/feed/subscriptions', { params: { page } })
-        setDocs(data.docs)
-        setTotal(data.total);
-        setItemsPerPage(data.itemsPerPage);
-      } catch (error) {
-        // silencioso, mesmo comportamento do Pages Router
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadDocs()
-  }, [page, user])
-
-  return (
-    <Container loading={false} unstylized className='container-full-width'>
-      <CardSkeleton loading={loading} loadingLabel="Carregando inscrições...">
+// Server Component (M1, etapa 2 v3) — mesma razão de UserLiked/UserDisliked. Pagina via
+// `?subsPage=N` (não `?page=`, que já é usado por Trend/Explorar na mesma rota `/`; ver
+// Paginate `pageParam` e app/page.tsx).
+export default async function Subs({ token, page }: SubsProps) {
+  return resolveSessionSection(
+    () => fetchSessionJSON<SubsFeed>(`/feed/subscriptions?page=${page}`, token),
+    'Não foi possível carregar suas inscrições agora.',
+    ({ docs, total, itemsPerPage }) => (
+      <Container loading={false} unstylized className="container-full-width">
         <VideoList className="subs list-flex-column">
-          {docs.map((item, key) => (
-            <VideoThumbItem key={key} video={item} placeholder={loading} />
+          {docs.map((item) => (
+            <VideoThumbItem key={item._id} video={item} />
+          ))}
+        </VideoList>
+        <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} pageParam="subsPage" />
+      </Container>
+    ),
+  );
+}
+
+export function SubsSkeleton() {
+  return (
+    <Container loading={false} unstylized className="container-full-width">
+      <CardSkeleton loading loadingLabel="Carregando inscrições...">
+        <VideoList className="subs list-flex-column">
+          {makePlaceholders<VideoData>(30).map((item, key) => (
+            <VideoThumbItem key={key} video={item} placeholder />
           ))}
         </VideoList>
       </CardSkeleton>
-      {!loading &&
-        <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} handlePaginate={setPage} />
-      }
     </Container>
-  )
+  );
 }
-
-export default Subs;
