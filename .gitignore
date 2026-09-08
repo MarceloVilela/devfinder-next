@@ -43,6 +43,7 @@ yarn-error.log*
 .env.local
 
 CLAUDE.local.md
+src/_deprecated/
 
 **__.**
 /md
