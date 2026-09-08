@@ -42,10 +42,12 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
   - `not-found.tsx`, `error.tsx` — páginas de erro (404/500)
   - `page.tsx`, `video/page.tsx`, `user/page.tsx`, `channel/page.tsx` — listagens, Server Component com `fetch` + ISR de 8h
   - `user/[slug]/page.tsx`, `video/[slug]/page.tsx`, `channel/[slug]/page.tsx` — detalhe, Server Component renderizado por request (`cache: 'no-store'`, sem `generateStaticParams` — o conjunto de slugs é aberto); usam `generateMetadata` para título dinâmico
-  - `login/page.tsx`, `video/refresh/page.tsx` — client-only (fluxo OAuth, dashboard de ações manuais).
+  - `login/page.tsx` — client-only (fluxo OAuth)
+  - `video/refresh/page.tsx` — Server Component só com `metadata` (`robots: noindex,nofollow`);
+    a lógica em si (dashboard de ações manuais) é `_components/RefreshClient.tsx`.
     `video/refresh` é ferramenta operacional de uso interno (disparar reprocessamento do feed),
     não faz parte do produto público e não é linkada a partir de nenhuma navegação visível
-  - `_components/` — Client Components (`'use client'`) usados como filhos das rotas Server: paginação, abas, botões de like/dislike/undo, formulário de login
+  - `_components/` — Client Components (`'use client'`) usados como filhos das rotas Server: paginação, abas, botões de like/dislike/undo, formulário de login, dashboard de `video/refresh`
 - `pages/api/` — Route Handlers legados (Pages API routes: `hello`, `jsonbin`, `video-refresh`) — coexistem com `app/` sem conflito
 - `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate, IconCategory); exportados via `components/index.ts`. Header/Footer/Paginate/IconCategory são `'use client'` (hooks/estado)
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
