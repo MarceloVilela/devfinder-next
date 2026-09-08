@@ -1,42 +1,54 @@
-'use client';
+import { CardSkeleton, Container, UserItem } from '../../components';
+import UsersList from '../user/style';
+import { UserData } from '../../hooks/auth';
+import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
+import { UndoableUserCard } from './UndoableUserCard';
+import { resolveSessionSection } from './sessionFetch';
+import { makePlaceholders } from '../../utils';
 
-import React from 'react'
-import { MdStarBorder } from 'react-icons/md'
+interface UserLikedProps {
+  token: string;
+}
 
-import { useAuth } from '../../hooks/auth'
-import { CardSkeleton, Container, UserItem } from '../../components'
-import UsersList from '../user/style'
-import { useUndoList } from './useUndoList'
+// Server Component (M1, etapa 2 v3) — só renderiza quando há token (isLoggedIn decidido no
+// pai, user/page.tsx), então o guard de visitante que existia na versão CSR não faz mais
+// sentido aqui: quem não tem sessão nunca chega a instanciar este componente.
+export default async function UserLiked({ token }: UserLikedProps) {
+  return resolveSessionSection(
+    () => fetchSessionJSON<UserData[]>('/likes/devs', token),
+    'Não foi possível carregar seus favoritos agora.',
+    (docs) => (
+      <Container loading={false} unstylized className="container-full-width">
+        <UsersList className="users list-flex-row">
+          {docs.map((user) => (
+            <UndoableUserCard
+              key={user._id}
+              user={user}
+              endpoint={`/likes/devs/${user.user}`}
+              successMessage={`${user.user} saiu de: Favoritos`}
+              errorFallback="Erro ao desfazer favorito."
+              kind="like"
+            />
+          ))}
+        </UsersList>
+      </Container>
+    ),
+  );
+}
 
-function UserLiked() {
-  const { user, isHydrated } = useAuth();
-
-  const { docs, loading, handleUndo } = useUndoList({
-    listUrl: '/likes/devs',
-    buildUndoUrl: (username) => `/likes/devs/${username}`,
-    isLoggedIn: isHydrated && !!(user && user._id),
-    guestMessage: 'Acessando como visitante, não é possível favoritar.',
-    buildSuccessMessage: (username) => `${username} saiu de: Favoritos`,
-    errorFallback: 'Erro ao desfazer favorito.',
-  })
-
+// Placeholder de loading usado pelo Suspense fallback em user/page.tsx — mesmo visual que a
+// versão CSR anterior mostrava via CardSkeleton, só que agora fora do componente que busca
+// dado (Server Component não tem estado de loading próprio, o fallback é externo).
+export function UserLikedSkeleton() {
   return (
     <Container loading={false} unstylized className="container-full-width">
-      <CardSkeleton loading={loading} loadingLabel="Carregando favoritos...">
+      <CardSkeleton loading loadingLabel="Carregando favoritos...">
         <UsersList className="users list-flex-row">
-          {docs.map((user, key) => (
-            <UserItem key={key} user={user} placeholder={loading}>
-              <div className='buttons single'>
-                <button type='button' onClick={() => handleUndo(user.user)}>
-                  <MdStarBorder className="dislike" aria-hidden="true" />Desmarcar
-                </button>
-              </div>
-            </UserItem>
+          {makePlaceholders<UserData>(50).map((user, key) => (
+            <UserItem key={key} user={user} placeholder />
           ))}
         </UsersList>
       </CardSkeleton>
     </Container>
-  )
+  );
 }
-
-export default UserLiked;

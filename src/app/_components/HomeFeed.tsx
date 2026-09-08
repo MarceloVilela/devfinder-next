@@ -3,24 +3,22 @@
 import React, { ReactNode } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 
-import { useAuth } from '../../hooks/auth';
-import Subs from './Subs';
 import ContainerFullWidth from '../video/style';
 
 interface HomeFeedProps {
   children: ReactNode;
+  isLoggedIn: boolean;
+  subs?: ReactNode;
 }
 
-export default function HomeFeed({ children }: HomeFeedProps) {
-  const { user, isHydrated } = useAuth();
-  const hasSubscriptionsTab = isHydrated && !!(user && user._id);
-
+// Ver comentário equivalente em UserTabs.tsx.
+export default function HomeFeed({ children, isLoggedIn, subs }: HomeFeedProps) {
   return (
     <ContainerFullWidth className="container-full-width" loading={false}>
       <Tabs.Root className="wrap-tabs-inline" defaultValue="explore">
         <Tabs.List className="tab-list">
           <Tabs.Trigger className="tab-trigger" value="explore">Explorar</Tabs.Trigger>
-          {hasSubscriptionsTab &&
+          {isLoggedIn &&
             <Tabs.Trigger className="tab-trigger" value="subs">Inscrições</Tabs.Trigger>
           }
         </Tabs.List>
@@ -28,9 +26,9 @@ export default function HomeFeed({ children }: HomeFeedProps) {
         <Tabs.Content value="explore">
           {children}
         </Tabs.Content>
-        {hasSubscriptionsTab &&
+        {isLoggedIn &&
           <Tabs.Content value="subs">
-            <Subs />
+            {subs}
           </Tabs.Content>
         }
       </Tabs.Root>

@@ -67,10 +67,12 @@ Abra [http://localhost:3000](http://localhost:3000) em seu navegador para utiliz
 
 ## Arquitetura de renderização
 
-App Router. SSR/ISR em **todas** as rotas de dado público — listagem (`/`, `/video`, `/user`,
-`/channel`, revalidação de 8h) e detalhe (`/user/:slug`, `/video/:slug`, `/channel/:slug`,
-renderizado por request, sem `generateStaticParams` porque o conjunto de slugs é aberto). A
-interatividade (like/dislike, paginação além da página 1) fica isolada em Client Components na
-folha da árvore. A única exceção é o que depende da sessão do usuário logado (favoritos,
-inscrições) — a sessão vive em `localStorage`, inacessível a um Server Component sem cookie
-`httpOnly`, então essas telas continuam CSR.
+App Router. SSR/ISR em **todas** as rotas — listagem (`/`, `/video`, `/user`, `/channel`,
+revalidação de 8h), detalhe (`/user/:slug`, `/video/:slug`, `/channel/:slug`, renderizado por
+request, sem `generateStaticParams` porque o conjunto de slugs é aberto) **e** as telas que
+dependem da sessão do usuário logado (favoritos, não seguidos, inscrições). A sessão vive num
+cookie `httpOnly` setado pelo backend; o Server Component lê esse cookie via `next/headers`
+(`cookies()`) e o reenvia manualmente no `fetch` pro backend (o `fetch` nativo do servidor não
+herda cookies do navegador automaticamente). Só a interatividade em si (toggle de like/dislike,
+botão de desmarcar, paginação) fica em Client Components na folha da árvore — a busca de dado,
+incluindo a personalizada, é Server Component.

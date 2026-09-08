@@ -1,42 +1,49 @@
-'use client';
+import { CardSkeleton, Container, UserItem } from '../../components';
+import UsersList from '../user/style';
+import { UserData } from '../../hooks/auth';
+import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
+import { UndoableUserCard } from './UndoableUserCard';
+import { resolveSessionSection } from './sessionFetch';
+import { makePlaceholders } from '../../utils';
 
-import React from 'react'
-import { MdSyncDisabled } from 'react-icons/md'
+interface UserDislikedProps {
+  token: string;
+}
 
-import { useAuth } from '../../hooks/auth'
-import { CardSkeleton, Container, UserItem } from '../../components'
-import UsersList from '../user/style'
-import { useUndoList } from './useUndoList'
+// Server Component (M1, etapa 2 v3) — ver comentário equivalente em UserLiked.tsx.
+export default async function UserDisliked({ token }: UserDislikedProps) {
+  return resolveSessionSection(
+    () => fetchSessionJSON<UserData[]>('/dislikes/devs', token),
+    'Não foi possível carregar sua lista de não seguidos agora.',
+    (docs) => (
+      <Container loading={false} unstylized className="container-full-width">
+        <UsersList className="users list-flex-row">
+          {docs.map((user) => (
+            <UndoableUserCard
+              key={user._id}
+              user={user}
+              endpoint={`/dislikes/devs/${user.user}`}
+              successMessage={`${user.user} saiu de: Não seguidos`}
+              errorFallback="Erro ao desfazer."
+              kind="dislike"
+            />
+          ))}
+        </UsersList>
+      </Container>
+    ),
+  );
+}
 
-function UserDisliked() {
-  const { user, isHydrated } = useAuth();
-
-  const { docs, loading, handleUndo } = useUndoList({
-    listUrl: '/dislikes/devs',
-    buildUndoUrl: (username) => `/dislikes/devs/${username}`,
-    isLoggedIn: isHydrated && !!(user && user._id),
-    guestMessage: 'Acessando como visitante, não é possível desabilitar.',
-    buildSuccessMessage: (username) => `${username} saiu de: Não seguidos`,
-    errorFallback: 'Erro ao desfazer.',
-  })
-
+export function UserDislikedSkeleton() {
   return (
     <Container loading={false} unstylized className="container-full-width">
-      <CardSkeleton loading={loading} loadingLabel="Carregando não seguidos...">
+      <CardSkeleton loading loadingLabel="Carregando não seguidos...">
         <UsersList className="users list-flex-row">
-          {docs.map((user, key) => (
-            <UserItem key={key} user={user} placeholder={loading}>
-              <div className='buttons single'>
-                <button type='button' onClick={() => handleUndo(user.user)}>
-                  <MdSyncDisabled aria-hidden="true" />Desmarcar
-                </button>
-              </div>
-            </UserItem>
+          {makePlaceholders<UserData>(50).map((user, key) => (
+            <UserItem key={key} user={user} placeholder />
           ))}
         </UsersList>
       </CardSkeleton>
     </Container>
-  )
+  );
 }
-
-export default UserDisliked;

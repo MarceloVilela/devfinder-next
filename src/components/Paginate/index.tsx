@@ -10,22 +10,26 @@ interface PaginateProps {
   page: number;
   totalItems?: number;
   itemsPerPage?: number;
-  // Opcional: quando ausente, o Paginate navega sozinho via `?page=N` na URL (usado pelas
-  // listagens SSR/RSC). Passe um callback só quando a paginação for controlada localmente por
-  // estado do próprio componente pai (ex.: Subs.tsx, que é CSR por depender da sessão).
+  // Nome da query string usada pra navegar (`?<pageParam>=N`). Default 'page' — só precisa
+  // trocar quando duas listagens paginadas coexistem na mesma rota (ex.: "/" tem `page` pra
+  // Trend/Explorar e `subsPage` pra Subs/Inscrições — mesma chave colidiria as duas paginações).
+  pageParam?: string;
+  // Opcional: quando ausente, o Paginate navega sozinho via `?<pageParam>=N` na URL (usado
+  // pelas listagens SSR/RSC). Passe um callback só quando a paginação for controlada
+  // localmente por estado do próprio componente pai.
   handlePaginate?(goTo: number): void;
 }
 
-const Paginate: React.FC<PaginateProps> = ({ page, totalItems, itemsPerPage, handlePaginate }) => {
+const Paginate: React.FC<PaginateProps> = ({ page, totalItems, itemsPerPage, pageParam = 'page', handlePaginate }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const navigateToPage = useCallback((goTo: number) => {
     const params = new URLSearchParams(searchParams?.toString());
-    params.set('page', String(goTo));
+    params.set(pageParam, String(goTo));
     router.push(`${pathname}?${params.toString()}`);
-  }, [router, pathname, searchParams]);
+  }, [router, pathname, searchParams, pageParam]);
 
   const totalPages = useMemo(() => {
     if (totalItems && itemsPerPage) {
