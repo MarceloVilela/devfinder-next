@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { UserData } from '../../hooks/auth'
 import { UserThumb } from './style';
@@ -29,9 +30,9 @@ const UserItem: React.FC<UserItemProps> = ({ user, placeholder, children }) => {
               <div className='bio'>
 
                 <header>
-                  <a href={`/user/${user.user}`}>
+                  <Link href={`/user/${user.user}`}>
                     <strong>{user.name}</strong>
-                  </a>
+                  </Link>
                   {children}
                 </header>
 

@@ -39,9 +39,13 @@ function UserLiked() {
       return;
     }
 
-    await api.delete(`/devs/${username}/likes`)
-    toast.success(`${username} saiu de: Favoritos`);
-    setDocs(docs.filter(user => user.user !== username))
+    try {
+      await api.delete(`/devs/${username}/likes`)
+      toast.success(`${username} saiu de: Favoritos`);
+      setDocs(docs.filter(user => user.user !== username))
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Erro ao desfazer favorito.'))
+    }
   }
 
   return (

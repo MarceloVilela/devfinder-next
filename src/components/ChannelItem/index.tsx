@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { ChannelData } from '../../types';
 import { ChannelThumb } from './style';
@@ -31,9 +32,9 @@ const ChannelItem: React.FC<ItemProps> = ({ item, placeholder }) => {
             </div>
 
             <aside>
-              <a href={`/channel/${item.name}`}>
+              <Link href={`/channel/${item.name}`}>
                 <strong>{item.name}</strong>
-              </a>
+              </Link>
               <small>{item.tags.join(", ")}</small>
             </aside>
           </ChannelThumb>

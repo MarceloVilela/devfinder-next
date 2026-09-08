@@ -39,9 +39,13 @@ function UserDisliked() {
       return;
     }
 
-    await api.delete(`/dislikes/devs/${username}`)
-    toast.success(`${username} saiu de: Não seguidos`);
-    setDocs(docs.filter(user => user.user !== username))
+    try {
+      await api.delete(`/dislikes/devs/${username}`)
+      toast.success(`${username} saiu de: Não seguidos`);
+      setDocs(docs.filter(user => user.user !== username))
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Erro ao desfazer.'))
+    }
   }
 
   return (
