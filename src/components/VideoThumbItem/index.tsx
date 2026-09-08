@@ -24,12 +24,10 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
               rel="noopener noreferrer"
             >
               <div className="thumb">
-                {/* unoptimized: thumb do YouTube já vem pré-dimensionada da fonte; fill+sizes aqui
-                   multiplicava srcset e estourou a cota de Image Optimization via crawler — ver
-                   vercel-image-optimization-quota.md. `sizes` removido: sem otimização não há
-                   srcset, então a prop ficaria inerte. */}
+                {/* sem `sizes`: otimização de imagem está desligada globalmente
+                   (next.config.js, images.unoptimized) — sem otimização não há srcset, então a
+                   prop ficaria inerte. */}
                 <Image
-                  unoptimized
                   src={video.thumbnail}
                   alt={video.title}
                   fill
@@ -39,11 +37,7 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
 
             <footer className='container-edge-spacing'>
               <div className='avatar'>
-                {/* unoptimized: mesma URL-fonte do thumb acima (video.thumbnail) — sem isso, essa
-                   segunda transformação continua consumindo a mesma cota que o fix acima quis
-                   zerar. Achado no code-review da etapa 1. */}
                 <Image
-                  unoptimized
                   src={video.thumbnail}
                   alt={video.title}
                   width={40}
