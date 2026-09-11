@@ -18,7 +18,7 @@ não é desejado aqui.
 pnpm dev      # servidor de desenvolvimento em http://localhost:3000
 pnpm build    # build de produção
 pnpm start    # servidor de produção (requer build anterior)
-pnpm lint     # ESLint via next lint
+pnpm lint     # ESLint CLI direto, eslint . --max-warnings=0 (sem o wrapper depreciado do next lint)
 ```
 
 ## Variáveis de ambiente
