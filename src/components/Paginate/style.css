@@ -1,0 +1,31 @@
+/* Migrado de style.ts (styled-components) — ADR 0002. Mantida a classe semântica `.paginate`
+   (em vez de só utilitárias inline) porque app/video/style.css tem uma regra de mobile que mira
+   `.video-list-shell .paginate` — contrato entre arquivos que precisa sobreviver a esta migração. */
+@reference "../../app/globals.css";
+
+/* @layer components: ver Container/style.css — sem isso, este CSS sem layer venceria qualquer
+   utilitária Tailwind aplicada via className. Achado 3, code-review etapa 1. */
+@layer components {
+
+.paginate {
+  @apply list-none flex flex-wrap mt-5;
+}
+
+.paginate li {
+  @apply bg-primary-stronger px-[10px] py-[5px] mr-[10px] cursor-pointer rounded-[3px] text-[#ccc];
+}
+
+.paginate li:hover {
+  @apply opacity-70;
+}
+
+.paginate li.selected {
+  @apply font-bold text-[#fff];
+}
+
+.paginate .begin,
+.paginate .end {
+  @apply opacity-70;
+}
+
+} /* @layer components */

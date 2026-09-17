@@ -3,7 +3,6 @@
 import React, { useCallback, useState } from 'react'
 import Axios from 'axios'
 import { toast } from 'react-toastify'
-import styled from 'styled-components'
 
 import api from '../../../../services/api'
 import { Container } from '../../../../components'
@@ -13,60 +12,6 @@ type DataRefresh = {
   videosAdded: any[]
   videosFounded: any[]
 }
-
-const Page = styled.main`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px 0;
-`
-
-const ButtonRow = styled.section`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-`
-
-const ActionButton = styled.button`
-  padding: 8px 16px;
-  cursor: pointer;
-`
-
-const ScreenshotRow = styled.div`
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-`
-
-const ScreenshotItem = styled.div`
-  flex: 0 0 auto;
-  max-width: 320px;
-
-  img {
-    width: 100%;
-    display: block;
-  }
-  p {
-    font-size: 12px;
-    word-break: break-all;
-  }
-`
-
-const PreContainer = styled.div`
-  pre {
-    overflow: auto;
-    max-height: 400px;
-  }
-  textarea {
-    width: 100%;
-    min-height: 200px;
-  }
-  p {
-    font-size: 12px;
-    color: gray;
-    margin-top: 4px;
-  }
-`
 
 export default function RefreshClient() {
   const [dataFeed, setDataFeed] = useState<any[]>([])
@@ -213,74 +158,76 @@ export default function RefreshClient() {
 
   return (
     <Container loading={false}>
-      <Page>
-        <ButtonRow>
-          <ActionButton
+      <main className="flex flex-col gap-4 py-4">
+        <section className="flex gap-2 flex-wrap">
+          <button
+            className="py-2 px-4 cursor-pointer"
             onClick={() => {
               wakeFinder()
               wakeAuto()
             }}
           >
             WAKE
-          </ActionButton>
-          <ActionButton onClick={handleGetFeedSubs}>FEED SUBS</ActionButton>
-          <ActionButton onClick={handleGetFeedAsJson}>
+          </button>
+          <button className="py-2 px-4 cursor-pointer" onClick={handleGetFeedSubs}>FEED SUBS</button>
+          <button className="py-2 px-4 cursor-pointer" onClick={handleGetFeedAsJson}>
             FEED AS JSON
-          </ActionButton>
-          <ActionButton onClick={handleRefreshFinder}>REFRESH</ActionButton>
-          <ActionButton onClick={handleGenerateContent}>CONTENT</ActionButton>
-          <ActionButton onClick={handleDownloadScreenshots}>
+          </button>
+          <button className="py-2 px-4 cursor-pointer" onClick={handleRefreshFinder}>REFRESH</button>
+          <button className="py-2 px-4 cursor-pointer" onClick={handleGenerateContent}>CONTENT</button>
+          <button className="py-2 px-4 cursor-pointer" onClick={handleDownloadScreenshots}>
             DOWN
-          </ActionButton>
-        </ButtonRow>
+          </button>
+        </section>
 
         <div>
           {screenshots.length > 0 && (
-            <ScreenshotRow>
+            <div className="flex gap-2 overflow-x-auto">
               {screenshots.map((source) => (
-                <ScreenshotItem key={source}>
+                <div key={source} className="flex-none max-w-[320px]">
                   {/* eslint-disable-next-line @next/next/no-img-element -- host dinâmico via NEXT_PUBLIC_API_AUTO, não dá para whitelisting em next.config.js */}
-                  <img src={source} alt="screenshot" />
-                  <p>{source}</p>
-                </ScreenshotItem>
+                  <img className="w-full block" src={source} alt="screenshot" />
+                  <p className="text-xs break-all">{source}</p>
+                </div>
               ))}
-            </ScreenshotRow>
+            </div>
           )}
 
           {description && (
-            <PreContainer>
+            <div>
               <textarea
+                className="w-full min-h-[200px]"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <p>/v1/description/feed</p>
-            </PreContainer>
+              <p className="text-xs text-[gray] mt-1">/v1/description/feed</p>
+            </div>
           )}
         </div>
 
         {(dataRefresh.errors ||
           dataRefresh.videosAdded ||
           dataRefresh.videosFounded) && (
-          <PreContainer>
-            <pre style={{ textAlign: 'left' }}>
+          <div>
+            <pre className="overflow-auto max-h-[400px]" style={{ textAlign: 'left' }}>
               {JSON.stringify(dataRefresh, null, 2)}
             </pre>
-            <p>/v1/video/refresh</p>
-          </PreContainer>
+            <p className="text-xs text-[gray] mt-1">/v1/video/refresh</p>
+          </div>
         )}
 
         {dataFeed.length > 0 && (
-          <PreContainer>
-            <pre style={{ textAlign: 'left' }}>
+          <div>
+            <pre className="overflow-auto max-h-[400px]" style={{ textAlign: 'left' }}>
               {JSON.stringify(dataFeed, null, 2)}
             </pre>
-            <p>
+            <p className="text-xs text-[gray] mt-1">
               {'https://api.jsonbin.io/v3/b/' +
                 process.env.NEXT_PUBLIC_JSONBIN_ID_CHANNEL}
             </p>
-          </PreContainer>
+          </div>
         )}
-      </Page>
+      </main>
     </Container>
   )
 }

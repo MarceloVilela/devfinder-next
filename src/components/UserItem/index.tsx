@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { UserData } from '../../hooks/auth'
-import { UserThumb } from './style';
+import './style.css';
 
 interface UserItemProps {
   user: UserData;
@@ -15,50 +15,50 @@ const UserItem: React.FC<UserItemProps> = ({ user, placeholder, children }) => {
     <>
       {!placeholder
         ? (
-          <UserThumb className="card">
-            <div className="avatar">
+          <li className="user-card card rounded-[10px] cursor-default! bg-background-weak mb-4">
+            <div className="avatar flex justify-center items-center ml-4">
               <a
                 href={`https://github.com/${user.user}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Image src={user.avatar} alt={user.name} width={48} height={48} />
+                <Image className="rounded-full" src={user.avatar} alt={user.name} width={48} height={48} />
               </a>
             </div>
 
-            <aside>
+            <aside className="flex flex-col justify-between flex-1 bg-inherit border-0 py-[15px] px-5 text-left rounded-b-[5px]">
               <div className='bio'>
 
-                <header>
+                <header className="flex items-center justify-between">
                   <Link href={`/user/${user.user}`}>
-                    <strong>{user.name}</strong>
+                    <strong className="text-base text-foreground-stronger">{user.name}</strong>
                   </Link>
                   {children}
                 </header>
 
-                <small>{user.bio}</small>
+                <small className="block overflow-hidden text-sm text-foreground-stronger mt-[5px]">{user.bio}</small>
               </div>
             </aside>
 
-          </UserThumb>
+          </li>
         ) : (
-          <UserThumb className="placeholder card">
-            <div className="avatar">
-              <div></div>
+          <li className="user-card placeholder card rounded-[10px] cursor-default! bg-background-weak mb-4">
+            <div className="avatar flex justify-center items-center ml-4">
+              <div className="w-12 h-12 rounded-full bg-[#ccc]"></div>
             </div>
 
-            <aside>
+            <aside className="flex flex-col justify-between flex-1 bg-inherit border-0 py-[15px] px-5 text-left rounded-b-[5px]">
               <div className='bio'>
 
-                <header>
-                  <p></p>
+                <header className="flex items-center justify-between">
+                  <p className="flex-1 h-4 mb-2 rounded-[6px] bg-[#ccc]"></p>
                 </header>
 
-                <p></p>
+                <p className="flex-1 h-4 mb-2 rounded-[6px] bg-[#ccc]"></p>
               </div>
             </aside>
 
-          </UserThumb>
+          </li>
         )}
     </>
 

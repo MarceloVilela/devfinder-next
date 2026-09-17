@@ -6,7 +6,7 @@ import { FaYoutube, FaGithub } from 'react-icons/fa';
 import { fetchJSON } from '../../../lib/fetchJSON';
 import { Container } from '../../../components';
 import { ChannelData, VideoData } from '../../../types';
-import About from './style';
+import './style.css';
 import ChannelLikeButtons from '../../_components/ChannelLikeButtons';
 import ChannelVideoFeed from '../../_components/ChannelVideoFeed';
 
@@ -61,10 +61,11 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
 
   return (
     <Container loading={false} className="containerVerticalCenter">
-      <About>
-        <li key={channel._id}>
-          <div className="avatar">
+      <ul className="channel-about bg-background-weakerer border border-background-weakerer rounded-[15px] mb-12">
+        <li key={channel._id} className="flex flex-col p-4">
+          <div className="avatar flex justify-center items-center">
             <Image
+              className="w-[100px] rounded-full"
               src={channel.avatar ? channel.avatar : 'https://yt3.ggpht.com/a/AATXAJzF6fuUyEFRBtZSpScb9M-Dq4QI6pyv0ic3pw=s100-c-k-c0xffffffff-no-rj-mo'}
               alt={channel.name}
               width={100}
@@ -72,30 +73,30 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
             />
           </div>
 
-          <aside>
-            <h3>{channel.name}</h3>
+          <aside className="flex flex-col justify-center flex-1 pl-4 text-left rounded-b-[5px]">
+            <h3 className="text-2xl font-normal text-foreground-stronger">{channel.name}</h3>
 
-            <div>
-              <strong>Tags</strong>
-              <p>{channel.tags.join(", ")}</p>
+            <div className="flex flex-wrap items-center mt-4">
+              <strong className="text-base text-foreground-stronger">Tags</strong>
+              <p className="text-sm leading-5 text-foreground-strong w-full">{channel.tags.join(", ")}</p>
             </div>
 
-            <div>
-              <strong>Sobre</strong>
-              <p>{channel.description}</p>
-              <p></p>
+            <div className="flex flex-wrap items-center mt-4">
+              <strong className="text-base text-foreground-stronger">Sobre</strong>
+              <p className="text-sm leading-5 text-foreground-strong w-full">{channel.description}</p>
+              <p className="text-sm leading-5 text-foreground-strong w-full"></p>
 
               <ChannelLikeButtons channelId={channel._id} channelName={channel.name} />
             </div>
 
-            <div>
-              <strong>Acessar</strong>
+            <div className="flex flex-wrap items-center mt-4">
+              <strong className="text-base text-foreground-stronger">Acessar</strong>
               <a
                 href={channel.link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FaYoutube color="#ff0000" />
+                <FaYoutube color="#ff0000" className="text-[32px] ml-8" />
               </a>
               {channel.userGithub &&
                 <a
@@ -103,13 +104,13 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaGithub color="#fff" />
+                  <FaGithub color="#fff" className="text-[32px] ml-8" />
                 </a>
               }
             </div>
           </aside>
         </li>
-      </About>
+      </ul>
 
       <ChannelVideoFeed
         docsStatic={docs}

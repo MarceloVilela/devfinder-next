@@ -2,7 +2,6 @@ import React from 'react'
 
 import { UserData } from '../../hooks/auth'
 import { Container, UserItem, Paginate } from '../../components'
-import UsersList from '../user/style'
 import UserLikeButtons from './UserLikeButtons'
 
 export interface UserAllProps {
@@ -16,13 +15,13 @@ function UserAll({ docsStatic, totalStatic, itemsPerPageStatic, page }: UserAllP
   return (
     <Container loading={false} unstylized className="container-full-width">
 
-      <UsersList className="users list-flex-row">
+      <ul className="users list-flex-row list-none">
         {docsStatic.map((user) => (
           <UserItem key={user._id} user={user} placeholder={false}>
             <UserLikeButtons userId={user._id} username={user.user} />
           </UserItem>
         ))}
-      </UsersList>
+      </ul>
       <Paginate page={page} totalItems={totalStatic} itemsPerPage={itemsPerPageStatic} />
     </Container>
   )

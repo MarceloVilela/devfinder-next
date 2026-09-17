@@ -19,7 +19,7 @@
 | Camada | Tecnologias |
 |---|---|
 | Framework | Next.js 15 (App Router) + TypeScript |
-| Estilização | styled-components v6 (SSR via registry próprio) |
+| Estilização | Tailwind CSS v4 (config CSS-first, sem `tailwind.config.ts`) |
 | Estado | Redux Toolkit — slices segmentados por domínio |
 | Autenticação | OAuth GitHub, backend próprio (`devfinder-api`) |
 | Data fetching | `fetch` nativo (Server Components, SSR/ISR) + Axios (Client Components) |
@@ -76,3 +76,14 @@ cookie `httpOnly` setado pelo backend; o Server Component lê esse cookie via `n
 herda cookies do navegador automaticamente). Só a interatividade em si (toggle de like/dislike,
 botão de desmarcar, paginação) fica em Client Components na folha da árvore — a busca de dado,
 incluindo a personalizada, é Server Component.
+
+## Limitações conhecidas
+
+- **Perda esporádica de CSS em runtime (resolvida)** — até a migração para Tailwind CSS v4
+  (setembro/2026), páginas com listagens grandes (`/`, `/video`) podiam ocasionalmente perder
+  regras de CSS injetadas via `styled-components` durante streaming SSR fragmentado — bug de
+  fundo do próprio `styled-components`
+  ([styled-components#3924](https://github.com/styled-components/styled-components/issues/3924)),
+  sem fix disponível a nível de aplicação. A migração de motor de CSS eliminou a causa raiz (sem
+  `<style>` injetado via JS, não há mais o que perder durante o streaming) — ver
+  `docs/decisions/0002-styling-stack.md` para o histórico completo da decisão.

@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 
 import { useAuth } from '../../hooks/auth';
-import LoginContainer from '../login/style';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -38,14 +37,24 @@ export default function LoginForm() {
   }, [message])
 
   return (
-    <LoginContainer>
-      <form>
-        <h1 className="logo">{process.env.NEXT_PUBLIC_TITLE}</h1>
+    <div className="h-full flex justify-center items-center">
+      <form className="w-full max-w-[300px] flex flex-col h-[33vh] justify-evenly">
+        <h1 className="logo font-['Grenze_Gotisch',cursive] text-center text-primary">{process.env.NEXT_PUBLIC_TITLE}</h1>
 
-        <Link href='/'><span className="login-visitor">Acessar como visitante</span></Link>
+        <Link
+          href='/'
+          className="mt-[10px] border-0 rounded-[4px] h-12 text-base bg-[#9373d8] font-bold text-white cursor-pointer flex justify-center items-center"
+        >
+          <span className="login-visitor bg-inherit">Acessar como visitante</span>
+        </Link>
 
-        <a href={process.env.NEXT_PUBLIC_API_URL + '/auth/github'} className="login-social-github">Acessar com Github</a>
+        <a
+          href={process.env.NEXT_PUBLIC_API_URL + '/auth/github'}
+          className="login-social-github mt-[10px] border-0 rounded-[4px] h-12 text-base bg-[#28a745] font-bold text-white cursor-pointer flex justify-center items-center"
+        >
+          Acessar com Github
+        </a>
       </form>
-    </LoginContainer>
+    </div>
   )
 }

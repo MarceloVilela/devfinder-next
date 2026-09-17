@@ -1,0 +1,44 @@
+/* Tailwind v4: arquivo CSS separado do entrypoint (app/globals.css) usando @apply precisa de
+   @reference pra enxergar o tema/utilitários sem duplicar a folha base no bundle — aponta pro
+   globals.css do projeto (não só "tailwindcss") pra também enxergar as utilitárias geradas do
+   @theme (bg-background-weak etc.), mesmo sem usar nenhuma aqui ainda. */
+@reference "../../app/globals.css";
+
+/* @layer components: sem isso, este CSS (sem layer) venceria incondicionalmente qualquer
+   utilitária Tailwind aplicada via className pra sobrescrever uma destas regras — mesmo
+   problema do reset global antes de @layer base em globals.css, recriado aqui. Achado 3,
+   code-review etapa 1. Ordem das layers (Tailwind v4: theme, base, components, utilities)
+   garante que utilities ainda vence components. */
+@layer components {
+
+/* Migrado de style.ts (styled-components) — ADR 0002. Classes semânticas mantidas (em vez de só
+   utilitárias inline) porque o componente aceita um `className` livre de quem chama (10+ call
+   sites passando 'containerVerticalCenter'/'container-full-width'), e trocar isso por props
+   booleanas mudaria a API pública do componente — fora do escopo desta migração (1:1 visual). */
+.container {
+  @apply max-w-[980px] mx-auto py-[10px] text-center pt-20 min-h-[94.8vh] min-h-[calc(100%-52px)];
+}
+
+.container.containerVerticalCenter {
+  @apply flex flex-col justify-center;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    @apply max-w-full w-full px-4 py-8 pt-[120px];
+  }
+
+  .container-full-width {
+    @apply px-0;
+  }
+
+  .break-row {
+    @apply flex-wrap;
+  }
+
+  .break-row > * {
+    @apply basis-full ml-0;
+  }
+}
+
+} /* @layer components */

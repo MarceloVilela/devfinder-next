@@ -1,10 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  compiler: {
-    // Enables the styled-components SWC transform
-    styledComponents: true
-  },
   images: {
     // Otimização de imagem da Vercel desligada globalmente: um crawler (meta-externalagent)
     // estourou a cota do plano Hobby varrendo o catálogo de vídeos — 9,2K de 9,2K edge

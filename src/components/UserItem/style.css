@@ -1,0 +1,48 @@
+/* Migrado de style.ts (styled-components) — ADR 0002. `.buttons`/`.buttons.single` estilizam
+   marcação renderizada por UserLikeButtons/UndoableUserCard (recebida via `children`), não pelo
+   próprio UserItem — mantido como seletor descendente (em vez de utilitária inline, que exigiria
+   tocar esses outros componentes, fora do escopo desta etapa). Escopado por `.user-card` (não
+   `.card`, que também é usado por VideoThumbItem) pra não vazar globalmente.
+
+   Nota: a regra original `.main-container .empty` (styled-components, escopada dentro do
+   UserThumb) não tinha nenhum consumidor real — nada dentro de um UserItem renderiza essas
+   classes — então foi descartada como código morto nesta migração, não portada. */
+@reference "../../app/globals.css";
+
+/* @layer components: ver Container/style.css — sem isso, este CSS sem layer venceria qualquer
+   utilitária Tailwind aplicada via className. Achado 3, code-review etapa 1. */
+@layer components {
+
+.user-card .buttons {
+  @apply grid grid-cols-2 gap-[10px];
+}
+
+.user-card .buttons button {
+  @apply p-2 shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] bg-[#685394] cursor-pointer;
+}
+
+.user-card .buttons button svg {
+  @apply text-base text-white;
+}
+
+.user-card .buttons button:hover svg {
+  @apply -translate-y-[5px] transition-all duration-200;
+}
+
+.user-card .buttons button:hover svg.dislike {
+  @apply translate-y-[5px] transition-all duration-200;
+}
+
+.user-card .buttons.single {
+  @apply grid-cols-1;
+}
+
+.user-card .buttons.single button {
+  @apply text-white flex items-center justify-center;
+}
+
+.user-card .buttons.single button svg {
+  @apply mr-[10px];
+}
+
+} /* @layer components */

@@ -4,7 +4,7 @@ import React, { useMemo, useCallback } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
-import { PaginateList } from './style';
+import './style.css';
 
 interface PaginateProps {
   page: number;
@@ -57,7 +57,7 @@ const Paginate: React.FC<PaginateProps> = ({ page, totalItems, itemsPerPage, pag
 
   return (
     <>
-      <PaginateList className="paginate">
+      <ul className="paginate">
         {page !== 1 &&
           <li onClick={() => _handlePaginate(1)}>
             <FaAngleDoubleLeft className="begin" />
@@ -75,7 +75,7 @@ const Paginate: React.FC<PaginateProps> = ({ page, totalItems, itemsPerPage, pag
             <FaAngleDoubleRight className="end" />
           </li>
         }
-      </PaginateList>
+      </ul>
     </>
   );
 }

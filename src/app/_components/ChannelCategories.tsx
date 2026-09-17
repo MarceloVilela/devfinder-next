@@ -5,7 +5,6 @@ import React, { useState, useMemo } from 'react'
 import { useAuth } from '../../hooks/auth';
 import { Container, ChannelItem } from '../../components'
 import { ChannelData } from '../../types'
-import ChannelContainer from '../channel/style';
 
 interface ChannelsGroupedByCategory {
   [key: string]: ChannelData[];
@@ -49,26 +48,24 @@ export default function ChannelCategories({ channelsStatic }: ChannelCategoriesP
 
   return (
     <Container loading={false}>
-      <ChannelContainer>
+      <section>
+        <select
+          aria-label="Filtrar canais por categoria"
+          value={activeCategoryIndex}
+          onChange={(e) => setActiveCategoryIndex(Number(e.target.value))}
+          className="mb-6 p-2 bg-inherit border-2 border-primary rounded-lg text-primary"
+        >
+          {categories?.map((name, key) => (
+            <option key={key} value={key}>{name}</option>
+          ))}
+        </select>
 
-        <section>
-          <select
-            aria-label="Filtrar canais por categoria"
-            value={activeCategoryIndex}
-            onChange={(e) => setActiveCategoryIndex(Number(e.target.value))}
-          >
-            {categories?.map((name, key) => (
-              <option key={key} value={key}>{name}</option>
-            ))}
-          </select>
-
-          <ul className='channels list-flex-row'>
-            {channelsCategorized[activeCategory]?.map((item) => (
-              <ChannelItem item={item} placeholder={false} key={item._id} />
-            ))}
-          </ul>
-        </section>
-      </ChannelContainer>
+        <ul className="channels list-flex-row grid gap-2 grid-cols-1 md:grid-cols-2 min-[992px]:grid-cols-3">
+          {channelsCategorized[activeCategory]?.map((item) => (
+            <ChannelItem item={item} placeholder={false} key={item._id} />
+          ))}
+        </ul>
+      </section>
     </Container>
   )
 }

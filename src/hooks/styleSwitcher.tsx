@@ -35,9 +35,8 @@ function useStyleSwitcher() {
     const next: ThemeAlias = alias === 'dark' ? 'light' : 'dark';
 
     localStorage.setItem('@DevFinder:theme', next);
-    // as variáveis CSS reais (styles/GlobalStyle.ts) são lidas via este atributo, não via
-    // props.theme do styled-components — atualizar aqui troca as cores na hora, sem esperar
-    // o Redux propagar a mudança em setAlias abaixo.
+    // as variáveis CSS reais (@theme em app/globals.css) são lidas via este atributo — atualizar
+    // aqui troca as cores na hora, sem esperar o Redux propagar a mudança em setAlias abaixo.
     document.documentElement.setAttribute('data-theme', next);
 
     dispatch(themeActions.setAlias(next));

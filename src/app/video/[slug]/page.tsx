@@ -6,7 +6,6 @@ import { FaYoutube, FaHome } from 'react-icons/fa';
 import { fetchJSON } from '../../../lib/fetchJSON';
 import { Container } from '../../../components';
 import { VideoData } from '../../../types';
-import About from './style';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -40,27 +39,29 @@ export default async function VideoDetail({ params }: PageProps) {
 
   return (
     <Container loading={false} className="containerVerticalCenter">
-      <About>
+      <article className="flex flex-col w-full items-center mx-auto">
         <Image
-          className="thumb"
+          className="border-0 rounded-2xl w-[270px] h-auto mb-6"
           src={video.thumbnail}
           alt={video.title}
           width={480}
           height={360}
-          style={{ width: '270px', height: 'auto' }}
         />
 
-        <p>{video.title}</p>
+        <p className="text-foreground-stronger w-[270px] mb-6">{video.title}</p>
 
-        <div className="buttons">
+        <div className="flex flex-col justify-between">
           <a
             href={video.url}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <button style={{ backgroundColor: "#ff0000" }}>
-              <span>Acessar</span>
-              <FaYoutube />
+            <button
+              style={{ backgroundColor: "#ff0000" }}
+              className="h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] cursor-pointer text-white flex items-center justify-center w-[270px] mb-6"
+            >
+              <span className="flex-1 text-left ml-6 uppercase font-bold">Acessar</span>
+              <FaYoutube className="text-2xl text-white mx-4 w-8" />
             </button>
           </a>
 
@@ -68,13 +69,13 @@ export default async function VideoDetail({ params }: PageProps) {
             href={'/'}
             rel="noopener noreferrer"
           >
-            <button>
-              <span>Listar outros</span>
-              <FaHome />
+            <button className="h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] bg-primary-stronger cursor-pointer text-white flex items-center justify-center w-[270px] mb-6">
+              <span className="flex-1 text-left ml-6 uppercase font-bold">Listar outros</span>
+              <FaHome className="text-2xl text-white mx-4 w-8" />
             </button>
           </a>
         </div>
-      </About>
+      </article>
     </Container>
   );
 }

@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { VideoData } from '../../types';
-import { Thumb } from './style';
 
 interface ItemProps {
   video: VideoData;
@@ -17,13 +16,13 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
     <>
       {!placeholder
         ? (
-          <Thumb className="card">
+          <li className="card rounded-[10px] cursor-default">
             <a
               href={video.url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <div className="thumb">
+              <div className="thumb flex justify-center items-center relative w-full aspect-[16/9]">
                 {/* sem `sizes`: otimização de imagem está desligada globalmente
                    (next.config.js, images.unoptimized) — sem otimização não há srcset, então a
                    prop ficaria inerte. */}
@@ -35,9 +34,10 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
               </div>
             </a>
 
-            <footer className='container-edge-spacing'>
+            <footer className="container-edge-spacing flex flex-row justify-between flex-1 mt-4 text-left">
               <div className='avatar'>
                 <Image
+                  className="w-10 h-10 rounded-full mr-2 object-cover"
                   src={video.thumbnail}
                   alt={video.title}
                   width={40}
@@ -46,28 +46,28 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
               </div>
 
               <div className='bio'>
-              <Link href={`/video/${idYoutubeWatch}`}><strong>{video.title}</strong></Link>
-                <small>{video.channel}</small>
+              <Link href={`/video/${idYoutubeWatch}`}><strong className="block mb-2 text-[16px] leading-[16px] max-h-8 overflow-hidden text-foreground-stronger">{video.title}</strong></Link>
+                <small className="block text-[14px] leading-[14px] max-h-7 overflow-hidden text-foreground-strong">{video.channel}</small>
               </div>
             </footer>
-          </Thumb>
+          </li>
         )
         : (
-          <Thumb className="placeholder card">
-            <div className="thumb">
+          <li className="placeholder card rounded-[10px] cursor-default">
+            <div className="thumb flex justify-center items-center relative w-full aspect-[16/9] bg-[#ccc] h-[174px]">
             </div>
 
-            <footer className='container-edge-spacing'>
-              <div className='avatar'>
+            <footer className="container-edge-spacing flex flex-row justify-between flex-1 mt-4 text-left">
+              <div className='avatar w-10 h-10 rounded-full mr-2 bg-[#ccc]'>
               </div>
 
-              <div className='bio'>
-                <p></p>
-                <p></p>
+              <div className='bio flex flex-1 flex-col'>
+                <p className="h-4 mb-[3px] rounded-[6px] bg-[#ccc]"></p>
+                <p className="h-4 mb-[3px] rounded-[6px] bg-[#ccc]"></p>
               </div>
             </footer>
 
-          </Thumb>
+          </li>
         )}
     </>
   );

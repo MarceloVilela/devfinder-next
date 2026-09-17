@@ -21,7 +21,7 @@ const AsyncSelect = dynamic(() => import("react-select/async"), {
   loading: () => <div aria-hidden="true" />,
 });
 
-import Wrapper from './style'
+import './style.css';
 import api from '../../services/api';
 
 type Option = {
@@ -67,7 +67,7 @@ export default function Header() {
   };
 
   return (
-    <Wrapper>
+    <header className="header-wrapper">
       <section>
         <Link href={`/`}>
             <h1 className="logo">{process.env.NEXT_PUBLIC_TITLE}</h1>
@@ -105,6 +105,6 @@ export default function Header() {
 
         </nav >
       </section >
-    </Wrapper >
+    </header >
   )
 }

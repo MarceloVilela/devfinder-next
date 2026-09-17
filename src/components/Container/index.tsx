@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
 import Image from 'next/image';
 
-import Main from './style';
+import { classNames } from '../../lib/classNames';
+import './style.css';
 
 interface ContainerProps {
   children: ReactNode;
@@ -12,10 +13,10 @@ interface ContainerProps {
 
 const Container: React.FC<ContainerProps> = ({ children, loading, className, unstylized }) => {
   return (
-    <Main className={`${unstylized ? '' : 'container'} ${className}`}>
+    <main className={classNames(unstylized ? '' : 'container', className)}>
       {loading
         ? (
-          <article className='loading-wrapper'>
+          <article className='fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
             <Image
               src="/load.gif"
               alt="Loading"
@@ -29,7 +30,7 @@ const Container: React.FC<ContainerProps> = ({ children, loading, className, uns
           children
         )
       }
-    </Main>
+    </main>
   );
 }
 

@@ -2,7 +2,9 @@
 
 ## Status
 
-Aceito.
+Aceito, **parcialmente substituído por `0002-styling-stack.md`**: a parte "manter
+styled-components" foi revertida lá (migração pra Tailwind, 2026-09-17) — a parte "Radix
+pontual, não adotar shadcn" continua valendo, `0002` reafirma em vez de reverter.
 
 ## Contexto
 

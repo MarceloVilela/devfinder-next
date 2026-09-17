@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 
 import { Container } from '../../components';
+import { TAB_TRIGGER_CLASSNAME } from './tabTriggerClassName';
 
 interface UserTabsProps {
   children: ReactNode;
@@ -21,13 +22,28 @@ interface UserTabsProps {
 export default function UserTabs({ children, isLoggedIn, liked, disliked }: UserTabsProps) {
   return (
     <Container loading={false}>
-      <Tabs.Root className="wrap-tabs-inline" defaultValue="start">
-        <Tabs.List className="tab-list">
-          <Tabs.Trigger className="tab-trigger" value="start">Início</Tabs.Trigger>
+      <Tabs.Root defaultValue="start">
+        <Tabs.List className="flex border-0 list-none">
+          <Tabs.Trigger
+            className={TAB_TRIGGER_CLASSNAME}
+            value="start"
+          >
+            Início
+          </Tabs.Trigger>
           {isLoggedIn &&
             <>
-              <Tabs.Trigger className="tab-trigger" value="liked">Favoritados</Tabs.Trigger>
-              <Tabs.Trigger className="tab-trigger" value="disliked">Não seguidos</Tabs.Trigger>
+              <Tabs.Trigger
+                className={TAB_TRIGGER_CLASSNAME}
+                value="liked"
+              >
+                Favoritados
+              </Tabs.Trigger>
+              <Tabs.Trigger
+                className={TAB_TRIGGER_CLASSNAME}
+                value="disliked"
+              >
+                Não seguidos
+              </Tabs.Trigger>
             </>
           }
         </Tabs.List>

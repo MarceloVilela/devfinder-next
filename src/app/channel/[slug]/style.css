@@ -1,0 +1,45 @@
+/* Migrado de style.ts (styled-components) — ADR 0002. `.buttons` estiliza marcação renderizada
+   por ChannelLikeButtons (componente `_components`, fora do escopo desta etapa), não pela
+   própria página — mantido como seletor descendente, escopado por `.channel-about` (não `.card`
+   nem `.buttons` soltos, que colidiriam com outros componentes que usam os mesmos tokens). */
+@reference "../../../app/globals.css";
+
+/* @layer components: ver Container/style.css — sem isso, este CSS sem layer venceria qualquer
+   utilitária Tailwind aplicada via className. Achado 3, code-review etapa 1. */
+@layer components {
+
+.channel-about .buttons {
+  @apply mt-[10px] grid grid-cols-2 gap-[10px];
+}
+
+.channel-about .buttons button {
+  @apply h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] bg-primary-stronger cursor-pointer text-foreground-stronger flex items-center justify-center;
+}
+
+.channel-about .buttons button span {
+  @apply mr-4;
+}
+
+.channel-about .buttons button svg {
+  @apply text-2xl text-white mx-4;
+}
+
+.channel-about .buttons button:hover svg {
+  @apply -translate-y-[5px] transition-all duration-200;
+}
+
+.channel-about .buttons button:hover svg.dislike {
+  @apply translate-y-[5px] transition-all duration-200;
+}
+
+/* @media (max-width:1024px) literal (não a variante `max-[1024px]:` do Tailwind, que compila
+   para `@media not all and (min-width:1024px)` — exclusivo em 1024px, diferente do breakpoint
+   inclusivo usado em Header/Container/Footer/video para o mesmo valor). Achado 1, code-review
+   etapa 1. */
+@media (max-width: 1024px) {
+  .channel-about aside {
+    @apply pl-0 pt-4;
+  }
+}
+
+} /* @layer components */

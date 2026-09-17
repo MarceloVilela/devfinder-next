@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 
-import StyledComponentsRegistry from './registry';
 import Providers from './providers';
+import './globals.css';
 
 const siteTitle = process.env.NEXT_PUBLIC_TITLE ?? 'DevFinder';
 
@@ -22,10 +22,10 @@ export const viewport: Viewport = {
 
 // Roda de forma síncrona e bloqueante antes do primeiro paint (script comum em <head>, sem
 // defer/async), lendo a preferência de tema salva (ou prefers-color-scheme, na primeira visita)
-// e aplicando o atributo que styles/GlobalStyle.ts usa pra escolher entre os dois blocos
-// estáticos de variáveis CSS. Elimina o flash de tema incorreto: nada de esperar hidratação do
-// React/Redux (hooks/styleSwitcher.tsx faz a mesma leitura, só que depois, pra manter o estado
-// do botão de alternância em app/providers.tsx sincronizado).
+// e aplicando o atributo que app/globals.css usa pra escolher entre os dois blocos estáticos de
+// variáveis CSS. Elimina o flash de tema incorreto: nada de esperar hidratação do React/Redux
+// (hooks/styleSwitcher.tsx faz a mesma leitura, só que depois, pra manter o estado do botão de
+// alternância em app/providers.tsx sincronizado).
 const themeInitScript = `(function(){try{var t=localStorage.getItem('@DevFinder:theme');if(t!=='dark'&&t!=='light'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -42,9 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body suppressHydrationWarning>
-        <StyledComponentsRegistry>
-          <Providers>{children}</Providers>
-        </StyledComponentsRegistry>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

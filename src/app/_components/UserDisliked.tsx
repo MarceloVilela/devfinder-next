@@ -1,5 +1,4 @@
 import { Container } from '../../components';
-import UsersList from '../user/style';
 import { UserData } from '../../hooks/auth';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
 import { UndoableUserCard } from './UndoableUserCard';
@@ -16,7 +15,7 @@ export default async function UserDisliked({ token }: UserDislikedProps) {
     'Não foi possível carregar sua lista de não seguidos agora.',
     (docs) => (
       <Container loading={false} unstylized className="container-full-width">
-        <UsersList className="users list-flex-row">
+        <ul className="users list-flex-row list-none">
           {docs.map((user) => (
             <UndoableUserCard
               key={user._id}
@@ -27,7 +26,7 @@ export default async function UserDisliked({ token }: UserDislikedProps) {
               kind="dislike"
             />
           ))}
-        </UsersList>
+        </ul>
       </Container>
     ),
   );

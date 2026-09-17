@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* Paleta portada de styles/Theme.ts (ADR 0002 — migração styled-components → Tailwind).
+   Declaradas dentro de @theme: Tailwind v4 gera classes utilitárias (bg-primary, text-foreground
+   etc.) que resolvem via var(--color-*) em vez de valor fixo — por isso a troca de tema abaixo
+   (:root[data-theme='light'], mesmo mecanismo de sempre) também revalida essas utilitárias em
+   runtime, não só CSS escrito à mão. */
+@theme {
+  --color-primary: #9373d8;
+  --color-primary-strong: #7d63b6;
+  --color-primary-stronger: #685394;
+  --color-background-weakerer: #524473;
+  --color-background-weak: #3d3451;
+  --color-background: #27242f;
+  --color-foreground: #aaa;
+  --color-foreground-strong: #ccc;
+  --color-foreground-stronger: #fff;
+}
+
+/* Quem decide qual bloco vale é o atributo data-theme no <html>, escrito por um script
+   bloqueante em app/layout.tsx antes do primeiro paint — elimina o flash de tema incorreto
+   (Server Components não conseguem ler Context/localStorage). Ver ADR 0002. */
+:root[data-theme='light'] {
+  --color-background-weakerer: #e3e3e3;
+  --color-background-weak: #ccc;
+  --color-background: #fff;
+  /* #767676 sobre #fff ≈ 4,54:1 — passa WCAG AA (4.5:1) para texto normal; #999 dava ≈ 2,85:1 */
+  --color-foreground: #767676;
+  --color-foreground-strong: #555;
+  --color-foreground-stronger: #333;
+}
+
+/* @layer base: sem isso, estas regras (fora de qualquer layer) venceriam incondicionalmente
+   qualquer classe utilitária do Tailwind usada via className (ml-4, py-4, mx-auto...) mesmo
+   tendo especificidade menor — em cascade layers, layer sempre decide antes de especificidade.
+   @apply dentro de style.css continua sem layer (script próprio, não afetado por isto), então
+   esse comportamento é só para o reset/global que compete com utilitárias usadas inline. */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    box-sizing: border-box;
+  }
+
+  html, body, #root, #__next {
+    height: 100%;
+  }
+
+  body {
+    background: var(--color-background);
+  }
+
+  body, input, button {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a img:hover {
+    opacity: 0.7;
+  }
+
+  a svg:hover {
+    opacity: 0.7;
+  }
+
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  .list-flex-row > *, .list-flex-column > * {
+    cursor: pointer;
+  }
+
+  .list-flex-row > *:hover, .list-flex-column > *:hover {
+    opacity: 0.7;
+  }
+
+  .list-flex-row, .list-flex-column {
+    list-style: none;
+    margin-top: 0;
+  }
+
+  .list-flex-row li {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .list-flex-column li {
+    display: flex;
+    flex-direction: column;
+  }
+}

@@ -37,8 +37,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
 
 - `app/` — rotas Next.js (App Router)
   - `layout.tsx` — layout raiz (`<html>/<body>`, fontes, metadata base)
-  - `registry.tsx` — registro de `styled-components` para SSR (`useServerInsertedHTML`)
-  - `providers.tsx` — `'use client'`: Redux, `ThemeProvider`, hidratação de auth/tema, `ToastContainer`
+  - `providers.tsx` — `'use client'`: Redux, hidratação de auth/tema, `ToastContainer`
   - `not-found.tsx`, `error.tsx` — páginas de erro (404/500)
   - `page.tsx`, `video/page.tsx`, `user/page.tsx`, `channel/page.tsx` — listagens, Server Component com `fetch` + ISR de 8h
   - `user/[slug]/page.tsx`, `video/[slug]/page.tsx`, `channel/[slug]/page.tsx` — detalhe, Server Component renderizado por request (`cache: 'no-store'`, sem `generateStaticParams` — o conjunto de slugs é aberto); usam `generateMetadata` para título dinâmico
@@ -54,12 +53,12 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
     de login e dashboard de `video/refresh` são `'use client'` — só a folha interativa, nunca a
     árvore de busca de dado (ver "Regra de renderização" abaixo)
 - `pages/api/` — Route Handlers legados (Pages API routes: `hello`, `jsonbin`, `video-refresh`) — coexistem com `app/` sem conflito
-- `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate, IconCategory); exportados via `components/index.ts`. Header/Footer/Paginate/IconCategory são `'use client'` (hooks/estado)
+- `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate); exportados via `components/index.ts`. Header/Footer/Paginate são `'use client'` (hooks/estado)
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
 - `lib/fetchJSON.ts` — helper tipado de `fetch` para uso em Server Component
 - `types/` — tipos de domínio compartilhados (`VideoData`, `ChannelData`) usados tanto por Server quanto Client Components
 - `hooks/` — `auth.tsx` (autenticação) e `styleSwitcher.tsx` (tema claro/escuro) — client-only, guardados por `isServer()`
-- `styles/` — `GlobalStyle.ts`, `Theme.ts` e declarações TypeScript para styled-components
+- `styles/css.d.ts` — declaração ambiente (`declare module '*.css'`) para imports de CSS como side-effect (`import './style.css'`) satisfazerem `tsc --noEmit`; o `next build`/`next dev` (webpack) já resolve isso nativamente, sem precisar da declaração
 - `_deprecated/` — código experimental untracked (transcrição/IA), fora do escopo do app; não referenciado por nenhuma rota
 
 ### Regra de renderização
@@ -77,21 +76,38 @@ anterior a esta migração) e `../reactjs/improvements/v3/devfinder-next/2-debit
 
 ### Estilização
 
-Usa **styled-components v6** com a transformação SWC habilitada em `next.config.js`, mais o
-registry de SSR em `app/registry.tsx` (necessário no App Router — sem ele o CSS não é injetado no
-`<head>` do HTML gerado no servidor). Cada rota tem um `style.ts` local com os componentes
-estilizados. Radix UI (não estilizado, acessível por padrão) é usado pontualmente para primitivos
-onde reimplementar acessibilidade à mão seria caro (`@radix-ui/react-tabs`) — decisão registrada
-em `docs/decisions/0001-styling-stack.md`.
+Usa **Tailwind CSS v4**, config CSS-first (`app/globals.css`: `@import "tailwindcss";` + bloco
+`@theme`, sem `tailwind.config.ts` nem `postcss.config.js`/`autoprefixer` separados — só
+`postcss.config.mjs` com o plugin `@tailwindcss/postcss`). Migrado de styled-components v6 (ADR
+`docs/decisions/0002-styling-stack.md`) — decisão motivada por um bug real de perda de CSS em SSR
+streaming (achado A1 do ADR 0002), não só preferência de stack; a migração resolveu esse bug pela
+raiz (troca de motor, não patch).
 
-As cores (`styles/Theme.ts`) chegam a todo componente — Server ou Client — via variáveis CSS
-estáticas definidas em `styles/GlobalStyle.ts` (`--color-*`), nunca via `props.theme.*` de
-styled-components; a escolha entre os dois temas é feita por um atributo `data-theme` no `<html>`,
-aplicado por um script bloqueante em `app/layout.tsx` antes do primeiro paint. Isso existe pra
-eliminar o flash de tema incorreto: como a preferência salva só existe em `localStorage`, o
-servidor não tem como saber o tema do usuário na resposta SSR, então nenhum componente pode
-depender do `theme` prop do `ThemeProvider` pra decidir cor — só a CSS estática, resolvida no
-cliente antes de qualquer pintura.
+Componentes com marcação própria usam classes utilitárias inline no `className`. Componentes com
+`className` livre vindo de fora (múltiplos call sites) ou seletores descendentes que miram
+marcação de outro componente (ex.: children injetado) usam um `style.css` co-localizado com
+`@apply`, sempre com `@reference "<caminho para app/globals.css>";` no topo — obrigatório em
+qualquer CSS fora do entrypoint que use `@apply` e precisa referenciar tokens do `@theme` do
+projeto (`bg-background-weak` etc.), não só o tema padrão do Tailwind. CSS assim escrito (fora de
+`@layer`) fica sem layer — o que já é o comportamento correto para essas regras, mas é o motivo
+pelo qual o reset/global abaixo precisa estar em `@layer base` explicitamente: no Tailwind v4,
+CSS sem layer sempre vence CSS dentro de qualquer layer, independente de especificidade — sem
+`@layer base` no reset, ele venceria até as classes utilitárias do Tailwind aplicadas via
+`className` (que ficam na layer `utilities`).
+
+Radix UI (não estilizado, acessível por padrão) é usado pontualmente para primitivos onde
+reimplementar acessibilidade à mão seria caro (`@radix-ui/react-tabs`) — decisão registrada em
+`docs/decisions/0001-styling-stack.md`, não alterada pela migração de motor CSS. Os slots do
+Radix Tabs (`Tabs.List`/`Tabs.Trigger`) recebem classes utilitárias diretamente, incluindo o
+variant `data-[state=active]:` para o estado da aba ativa — sem CSS separado.
+
+As cores (`@theme` em `app/globals.css`) chegam a todo componente — Server ou Client — via
+variáveis CSS estáticas (`--color-*`), nunca via prop de tema de runtime; a escolha entre os dois
+temas é feita por um atributo `data-theme` no `<html>`, aplicado por um script bloqueante em
+`app/layout.tsx` antes do primeiro paint. Isso existe pra eliminar o flash de tema incorreto: como
+a preferência salva só existe em `localStorage`, o servidor não tem como saber o tema do usuário
+na resposta SSR, então nenhum componente pode depender de estado de runtime pra decidir cor — só
+a CSS estática, resolvida no cliente antes de qualquer pintura.
 
 ### Dados externos
 

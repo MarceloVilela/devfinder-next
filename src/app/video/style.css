@@ -1,0 +1,60 @@
+/* referencia globals.css (não só "tailwindcss") porque usa bg-background-weak, utilitária
+   gerada a partir do @theme do projeto — "tailwindcss" sozinho só traria o tema padrão. */
+@reference "../globals.css";
+
+/* @layer components: ver Container/style.css — sem isso, este CSS sem layer venceria qualquer
+   utilitária Tailwind aplicada via className. Achado 3, code-review etapa 1. */
+@layer components {
+
+/* .video-list-shell: classe própria (não reaproveita 'container-full-width', que é um token
+   compartilhado por vários outros consumidores de Container sem essa regra extra) — escopo
+   equivalente ao `&` do styled(Container) original, só pra esta instância (HomeFeed). */
+@media (max-width: 1024px) {
+  .video-list-shell {
+    @apply w-full ml-0 mr-0 pl-0 pr-0;
+  }
+  .video-list-shell .container-edge-spacing,
+  .video-list-shell .tab-list,
+  .video-list-shell .paginate {
+    @apply px-4;
+  }
+  .video-list-shell .tab-list {
+    @apply mb-0;
+  }
+}
+
+.video-list {
+  @apply grid gap-6 grid-cols-1;
+}
+
+.video-list .bio {
+  @apply flex-1;
+}
+
+@media (max-width: 599px) {
+  .video-list li.card {
+    @apply bg-background-weak p-4 ml-4 mr-4;
+  }
+
+  .video-list li.card + li.card {
+    @apply mb-4;
+  }
+
+  .video-list li.card .container-edge-spacing {
+    @apply px-0;
+  }
+}
+
+@media (min-width: 600px) {
+  .video-list {
+    @apply grid-cols-2 m-0;
+  }
+}
+
+@media (min-width: 900px) {
+  .video-list {
+    @apply grid-cols-3;
+  }
+}
+
+} /* @layer components */

@@ -1,0 +1,90 @@
+/* Migrado de style.ts (styled-components) — ADR 0002. Mantido como seletores descendentes (em
+   vez de utilitárias inline) porque parte do CSS mira o container raiz do AsyncSelect
+   (react-select) via `section > div` — um elemento que não renderizamos diretamente, então não
+   dá pra por className direto nele com segurança. */
+@reference "../../app/globals.css";
+
+/* @layer components: ver Container/style.css — sem isso, este CSS sem layer venceria qualquer
+   utilitária Tailwind aplicada via className. Achado 3, code-review etapa 1. */
+@layer components {
+
+.header-wrapper {
+  @apply fixed top-0 w-full opacity-95 bg-[#222] z-[9];
+}
+
+.header-wrapper section {
+  @apply max-w-[980px] mx-auto py-2 text-center flex content-between flex-wrap;
+}
+
+.header-wrapper section > a {
+  @apply flex;
+}
+
+.header-wrapper section > div {
+  @apply flex flex-[2] mt-0 mr-4 mb-0 ml-8;
+}
+
+.header-wrapper section > div > div {
+  @apply flex-1;
+}
+
+.header-wrapper nav a {
+  @apply relative;
+}
+
+.header-wrapper nav a > div {
+  @apply absolute w-[300px] right-0 top-10;
+}
+
+.header-wrapper nav a div {
+  @apply bg-background text-primary outline-primary border-primary text-left;
+}
+
+.header-wrapper nav a div:hover {
+  @apply outline-primary border-primary;
+}
+
+.header-wrapper section nav {
+  @apply flex flex-1 items-center justify-between;
+}
+
+/* Ícone em cima do texto, centralizado — em todas as larguras (pedido do usuário, igual aos
+   ícones de rodapé do YouTube). Precisa de flex explícito: o preflight do Tailwind põe svg em
+   display:block (o browser usa inline por padrão), então sem isso o ícone e o texto nem ficariam
+   empilhados de forma previsível/centralizada. */
+.header-wrapper section nav a {
+  @apply no-underline text-[#ccc] ml-4 text-[0.8rem] flex flex-col items-center;
+}
+
+.header-wrapper section nav a span {
+  @apply -mt-1;
+}
+
+.header-wrapper section nav svg {
+  @apply text-[20px];
+}
+
+.header-wrapper .logo {
+  font-family: 'Grenze Gotisch', cursive;
+  @apply text-[1.5em] text-center text-primary;
+}
+
+@media (max-width: 1024px) {
+  .header-wrapper section {
+    @apply p-4;
+  }
+
+  .header-wrapper section > a {
+    @apply order-1 flex-1;
+  }
+
+  .header-wrapper section > div {
+    @apply order-3 min-w-full w-full mt-2 mr-0 mb-0 ml-0;
+  }
+
+  .header-wrapper section > nav {
+    @apply order-2 flex-[2];
+  }
+}
+
+} /* @layer components */
