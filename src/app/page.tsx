@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
 
 import { fetchJSON } from '../lib/fetchJSON';
 import { getSessionToken } from '../lib/fetchSessionJSON';
 import { VideoData } from '../types';
 import HomeFeed from './_components/HomeFeed';
 import Trend from './_components/Trend';
-import Subs, { SubsSkeleton } from './_components/Subs';
+import Subs from './_components/Subs';
 
 // A "/" coincide com o segmento do root layout — o `template` de título definido lá
 // não se aplica ao próprio segmento que o declara (comportamento documentado do Next.js),
@@ -32,21 +31,19 @@ export default async function HomePage({ searchParams }: PageProps) {
   const currentPage = Number(page) || 1;
   const currentSubsPage = Number(subsPage) || 1;
 
-  const [{ docs, total, itemsPerPage }, token] = await Promise.all([
+  const token = await getSessionToken();
+
+  const [{ docs, total, itemsPerPage }, subs] = await Promise.all([
     fetchJSON<TrendingFeed>(`/feed/trending?page=${currentPage}`, {
       next: { revalidate: 60 * 60 * 8 },
     }),
-    getSessionToken(),
+    token ? Subs({ token, page: currentSubsPage }) : undefined,
   ]);
 
   return (
     <HomeFeed
       isLoggedIn={!!token}
-      subs={token && (
-        <Suspense fallback={<SubsSkeleton />}>
-          <Subs token={token} page={currentSubsPage} />
-        </Suspense>
-      )}
+      subs={subs}
     >
       <Trend docsStatic={docs} totalStatic={total} itemsPerPageStatic={itemsPerPage} page={currentPage} />
     </HomeFeed>

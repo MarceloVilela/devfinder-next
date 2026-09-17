@@ -1,9 +1,8 @@
-import { CardSkeleton, Container, Paginate, VideoThumbItem } from '../../components';
+import { Container, Paginate, VideoThumbItem } from '../../components';
 import { VideoData } from '../../types';
 import { VideoList } from '../video/style';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
 import { resolveSessionSection } from './sessionFetch';
-import { makePlaceholders } from '../../utils';
 
 interface SubsFeed {
   docs: VideoData[];
@@ -33,19 +32,5 @@ export default async function Subs({ token, page }: SubsProps) {
         <Paginate page={page} totalItems={total} itemsPerPage={itemsPerPage} pageParam="subsPage" />
       </Container>
     ),
-  );
-}
-
-export function SubsSkeleton() {
-  return (
-    <Container loading={false} unstylized className="container-full-width">
-      <CardSkeleton loading loadingLabel="Carregando inscrições...">
-        <VideoList className="subs list-flex-column">
-          {makePlaceholders<VideoData>(30).map((item, key) => (
-            <VideoThumbItem key={key} video={item} placeholder />
-          ))}
-        </VideoList>
-      </CardSkeleton>
-    </Container>
   );
 }

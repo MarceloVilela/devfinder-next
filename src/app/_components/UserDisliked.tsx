@@ -1,10 +1,9 @@
-import { CardSkeleton, Container, UserItem } from '../../components';
+import { Container } from '../../components';
 import UsersList from '../user/style';
 import { UserData } from '../../hooks/auth';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
 import { UndoableUserCard } from './UndoableUserCard';
 import { resolveSessionSection } from './sessionFetch';
-import { makePlaceholders } from '../../utils';
 
 interface UserDislikedProps {
   token: string;
@@ -31,19 +30,5 @@ export default async function UserDisliked({ token }: UserDislikedProps) {
         </UsersList>
       </Container>
     ),
-  );
-}
-
-export function UserDislikedSkeleton() {
-  return (
-    <Container loading={false} unstylized className="container-full-width">
-      <CardSkeleton loading loadingLabel="Carregando não seguidos...">
-        <UsersList className="users list-flex-row">
-          {makePlaceholders<UserData>(50).map((user, key) => (
-            <UserItem key={key} user={user} placeholder />
-          ))}
-        </UsersList>
-      </CardSkeleton>
-    </Container>
   );
 }
