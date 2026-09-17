@@ -71,9 +71,9 @@ num cookie `httpOnly` setado pelo backend; o Server Component lê esse cookie vi
 `fetch` nativo do servidor não herda cookies do navegador automaticamente. Só a interatividade em
 si (toggle de like/dislike, botão de desmarcar, paginação) fica em Client Components na folha da
 árvore — a busca de dado, incluindo a personalizada, é Server Component. Detalhe completo em
-`../reactjs/improvements/devfinder-next-app-router-migration.md` (estado anterior a esta
-migração) e `../reactjs/improvements/v3/devfinder-next/2-debito-arquitetural.md` (M1, a
-migração em si).
+`../reactjs/improvements/v1/devfinder-next/devfinder-next-app-router-migration.md` (estado
+anterior a esta migração) e `../reactjs/improvements/v3/devfinder-next/2-debito-arquitetural.md`
+(M1, a migração em si).
 
 ### Estilização
 
@@ -98,3 +98,9 @@ cliente antes de qualquer pintura.
 O backend REST em `NEXT_PUBLIC_API_URL` fornece os dados de vídeos, canais e usuários. Listagens
 usam `fetch` com `next: { revalidate: 60 * 60 * 8 }` (ISR); detalhe usa `fetch` com
 `cache: 'no-store'` (renderizado por request).
+
+Trade-off aceito (M1): as 3 seções de sessão (`Subs` em `/` e `/video`, `UserLiked`/`UserDisliked`
+em `/user`) são buscadas a cada carga logada da rota correspondente, independente de qual aba
+está ativa — o Radix Tabs só evita re-render client-side da aba inativa, não o fetch
+server-side que já resolveu o Server Component passado como prop. Decisão consciente (sem custo
+de transformação de imagem associado, só requests de dado), não um bug — ver PR #7.

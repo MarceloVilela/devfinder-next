@@ -28,7 +28,8 @@ jobs:
 # "/channel", "/video") são Server Components que buscam com `fetch(..., { next: { revalidate }
 # })` direto em NEXT_PUBLIC_API_URL (App Router, não mais getStaticProps do Pages Router) — o
 # `next build` ainda executa esse fetch em build-time por causa do ISR, então só passa com um
-# backend real e acessível no ar (verificado localmente com devfinder-api rodando). Não há hoje
-# uma URL pública estável do backend para apontar o CI (as opções antigas em .env.example —
-# herokuapp.com, onrender.com — não respondem mais). Gatear o PR nisso tornaria o CI refém da
-# disponibilidade de um serviço externo fora do controle deste repositório.
+# backend real e acessível no ar (verificado localmente com devfinder-api rodando). O único
+# backend público hoje é o deploy de referência em onrender.com — plano gratuito, sem SLA,
+# sujeito a cold start; nada garante que responda a tempo durante o build de um CI de terceiros.
+# Gatear o PR nisso tornaria o CI refém da disponibilidade de um serviço externo fora do
+# controle deste repositório.

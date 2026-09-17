@@ -27,7 +27,7 @@
 
 ## Demostração
 
-Caso deseje visualizar aplicação antes de instalar, você pode acessar o <a href="https://dev-finder.netlify.app/">link da aplicação</a> que esta hospedada na Netlify.
+Caso deseje visualizar aplicação antes de instalar, você pode acessar o <a href="https://devfinder.vercel.app/">link da aplicação</a> que esta hospedada na Vercel.
 
 # Para executar locamente:
 

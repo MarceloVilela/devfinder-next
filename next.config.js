@@ -7,9 +7,11 @@ const nextConfig = {
   },
   images: {
     // Otimização de imagem da Vercel desligada globalmente: um crawler (meta-externalagent)
-    // estourou a cota do plano Hobby varrendo o catálogo de vídeos (vercel-image-optimization-
-    // quota.md). O fix inicial (H4, etapa 1 v3) cobriu só a thumbnail de vídeo — o ponto de
-    // maior volume — via `unoptimized` local; qualquer outra rota com <Image> remota (UserItem,
+    // estourou a cota do plano Hobby varrendo o catálogo de vídeos — 9,2K de 9,2K edge
+    // requests em 12h, 8,5K delas em /_next/image, 1% cache hit (observado direto no
+    // dashboard da Vercel na hora do incidente; achado H4, etapa 1 v3). O fix inicial cobriu
+    // só a thumbnail de vídeo — o ponto de maior volume — via `unoptimized` local; qualquer
+    // outra rota com <Image> remota (UserItem,
     // ChannelItem, páginas de detalhe user/channel/video, todas sem cache de ISR) continuava
     // exposta ao mesmo risco. Todas as imagens remotas (YouTube, GitHub) já vêm pré-
     // dimensionadas da fonte, então a otimização não agregava valor visual que justifique manter
