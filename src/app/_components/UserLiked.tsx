@@ -1,10 +1,9 @@
-import { CardSkeleton, Container, UserItem } from '../../components';
+import { Container } from '../../components';
 import UsersList from '../user/style';
 import { UserData } from '../../hooks/auth';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
 import { UndoableUserCard } from './UndoableUserCard';
 import { resolveSessionSection } from './sessionFetch';
-import { makePlaceholders } from '../../utils';
 
 interface UserLikedProps {
   token: string;
@@ -33,22 +32,5 @@ export default async function UserLiked({ token }: UserLikedProps) {
         </UsersList>
       </Container>
     ),
-  );
-}
-
-// Placeholder de loading usado pelo Suspense fallback em user/page.tsx — mesmo visual que a
-// versão CSR anterior mostrava via CardSkeleton, só que agora fora do componente que busca
-// dado (Server Component não tem estado de loading próprio, o fallback é externo).
-export function UserLikedSkeleton() {
-  return (
-    <Container loading={false} unstylized className="container-full-width">
-      <CardSkeleton loading loadingLabel="Carregando favoritos...">
-        <UsersList className="users list-flex-row">
-          {makePlaceholders<UserData>(50).map((user, key) => (
-            <UserItem key={key} user={user} placeholder />
-          ))}
-        </UsersList>
-      </CardSkeleton>
-    </Container>
   );
 }
