@@ -15,16 +15,21 @@
    utilitárias inline) porque o componente aceita um `className` livre de quem chama (10+ call
    sites passando 'containerVerticalCenter'/'container-full-width'), e trocar isso por props
    booleanas mudaria a API pública do componente — fora do escopo desta migração (1:1 visual). */
-.container {
+/* Nome não pode ser `.container`: colide com a utility nativa responsiva do Tailwind
+   (mesmo nome), que vence porque fica na layer `utilities` — qualquer regra daqui, em
+   `@layer components`, perde pra ela em `max-width`/`width` a partir de 640px (achado de
+   revisão humana, review-human.md #3). `.header-wrapper section` nunca teve esse problema por
+   já usar seletor próprio em vez do nome genérico. */
+.app-container {
   @apply max-w-[980px] mx-auto py-[10px] text-center pt-20 min-h-[94.8vh] min-h-[calc(100%-52px)];
 }
 
-.container.containerVerticalCenter {
+.app-container.containerVerticalCenter {
   @apply flex flex-col justify-center;
 }
 
 @media (max-width: 1024px) {
-  .container {
+  .app-container {
     @apply max-w-full w-full px-4 py-8 pt-[120px];
   }
 
