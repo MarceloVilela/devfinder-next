@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 
 import { fetchDetail } from '../../../lib/fetchDetail';
-import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../../lib/fetchListing';
-import { Container, FeedbackMessage } from '../../../components';
+import { fetchListing, ListingFeed } from '../../../lib/fetchListing';
+import { Container } from '../../../components';
 import { ChannelData, VideoData } from '../../../types';
 import './style.css';
 import ChannelLikeButtons from '../../_components/ChannelLikeButtons';
@@ -22,10 +22,13 @@ async function getChannel(searchQuery: string): Promise<ChannelData | null> {
 }
 
 // Ao contrário de getChannel, o feed do canal não tem semântica de "não encontrado" — mesmo
-// canal com feed vazio ainda é uma resposta válida. Usa `fetchListing` (mesmo padrão das 4
-// listagens públicas: catch + null + log) em vez de deixar timeout virar error.tsx cru (achado
-// do fechamento v4 — a versão anterior deste código tinha `timeoutMs` sem nenhum catch).
-async function getChannelFeed(channelName: string, page: number): Promise<ListingFeed<VideoData> | null> {
+// canal com feed vazio ainda é uma resposta válida. Usa `fetchListing` só pelo timeout/log
+// (achado #3); erro de rede real sobe pro `error.tsx` global, igual ao resto desta página de
+// detalhe (`getChannel`/`fetchDetail` — ver `docs/limitacoes-conhecidas.md`) — não tem cache de
+// ISR pra proteger aqui (rota já é dinâmica por causa do `cache: 'no-store'` de `getChannel`),
+// então não se aplica o motivo que fez as 4 listagens públicas manterem fallback local antes
+// desta correção (review-human.md #1).
+async function getChannelFeed(channelName: string, page: number): Promise<ListingFeed<VideoData>> {
   return fetchListing<ListingFeed<VideoData>>(
     `/feed/channel?channel_name=${encodeURIComponent(channelName)}&page=${page}`,
   );
@@ -54,10 +57,6 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
   }
 
   const feed = await getChannelFeed(channel.name, currentPage);
-
-  if (!feed) {
-    return <FeedbackMessage message={LISTING_UNAVAILABLE_MESSAGE} />;
-  }
 
   const { docs, total, itemsPerPage } = feed;
 

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { fetchListing, ListingFeed } from '../../lib/fetchListing';
 import { getSessionToken } from '../../lib/fetchSessionJSON';
 import { UserData } from '../../hooks/auth';
-import { FeedbackMessage } from '../../components';
 import UserTabs from '../_components/UserTabs';
 import UserAll from '../_components/UserAll';
 import UserLiked from '../_components/UserLiked';
@@ -30,10 +29,6 @@ export default async function UserListPage({ searchParams }: PageProps) {
     token ? UserLiked({ token }) : undefined,
     token ? UserDisliked({ token }) : undefined,
   ]);
-
-  if (!devs) {
-    return <FeedbackMessage message={LISTING_UNAVAILABLE_MESSAGE} />;
-  }
 
   const { docs, total, itemsPerPage } = devs;
 

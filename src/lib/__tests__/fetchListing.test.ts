@@ -19,11 +19,11 @@ describe('fetchListing', () => {
     await expect(fetchListing('/channels')).resolves.toEqual({ docs: [] });
   });
 
-  it('retorna null e loga a falha em vez de propagar o erro (achado #3, code-review Etapa 2)', async () => {
+  it('loga a falha e propaga o erro (review-human.md #1 — não engole mais pra não envenenar cache do ISR)', async () => {
     console.error = jest.fn();
     global.fetch = jest.fn().mockRejectedValue(new Error('timeout')) as unknown as typeof fetch;
 
-    await expect(fetchListing('/channels')).resolves.toBeNull();
+    await expect(fetchListing('/channels')).rejects.toThrow('timeout');
     expect(console.error).toHaveBeenCalledWith(expect.stringContaining('/channels'), expect.any(Error));
   });
 });

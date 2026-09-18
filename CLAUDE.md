@@ -134,10 +134,13 @@ server-side que já resolveu o Server Component passado como prop. Decisão cons
 de transformação de imagem associado, só requests de dado), não um bug — ver PR #7.
 
 Mesmo trade-off se estende ao timeout de listagem (A4, v4 Etapa 2): a seção de sessão roda no
-mesmo `Promise.all` da listagem pública, então toda vez que a listagem falha (`fetchListing`
-retorna `null`) o fetch/render da seção de sessão já foi disparado em paralelo e é descartado no
-fallback (`if (!trend) return <FeedbackMessage />`). Ir sequencial (só buscar sessão depois de
-confirmar a listagem) eliminaria esse desperdício, mas custaria uma rodada extra de latência no
-caminho comum (listagem OK, que é a maioria dos casos) pra economizar uma request rara (backend
-fora do ar). Mantido paralelo por ser o trade-off menos custoso no caso comum — sinalizado aqui
-pra não ser achado de novo como se fosse regressão não intencional (achado do fechamento v4).
+mesmo `Promise.all` da listagem pública, então toda vez que a listagem falha o fetch/render da
+seção de sessão já foi disparado em paralelo e é descartado — desde `review-human.md` #1,
+`fetchListing` relança o erro em vez de devolver `null`, e a página inteira (session incluída)
+aborta via exceção pro `error.tsx` global, em vez do antigo `if (!trend) return
+<FeedbackMessage />`; o desperdício descrito aqui é o mesmo, só muda o mecanismo de descarte. Ir
+sequencial (só buscar sessão depois de confirmar a listagem) eliminaria esse desperdício, mas
+custaria uma rodada extra de latência no caminho comum (listagem OK, que é a maioria dos casos)
+pra economizar uma request rara (backend fora do ar). Mantido paralelo por ser o trade-off menos
+custoso no caso comum — sinalizado aqui pra não ser achado de novo como se fosse regressão não
+intencional (achado do fechamento v4).
