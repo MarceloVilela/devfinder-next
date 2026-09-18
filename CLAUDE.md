@@ -56,10 +56,18 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
     `UndoableUserCard` (botão "Desmarcar"), `ChannelLikeButtons`/`UserLikeButtons`, formulário
     de login e dashboard de `video/refresh` são `'use client'` — só a folha interativa, nunca a
     árvore de busca de dado (ver "Regra de renderização" abaixo)
-- `pages/api/` — Route Handlers legados (Pages API routes: `hello`, `jsonbin`, `video-refresh`) — coexistem com `app/` sem conflito
+- `pages/api/` — Route Handler legado (Pages API route: `jsonbin`) — mantido fora do App Router
+  porque só lê segredo de servidor puro (master key do JSONBin) sem estado de sessão do usuário,
+  sem necessidade real de virar Route Handler do App Router; coexiste com `app/` sem conflito
 - `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate); exportados via `components/index.ts`. Header/Footer/Paginate são `'use client'` (hooks/estado)
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
-- `lib/fetchJSON.ts` — helper tipado de `fetch` para uso em Server Component
+- `lib/fetchJSON.ts` — helper tipado de `fetch` para uso em Server Component, com timeout opcional
+  (`timeoutMs`) via `DEFAULT_FETCH_TIMEOUT_MS`; `lib/fetchListing.ts` encapsula o padrão das 4
+  listagens públicas (timeout + catch + fallback amigável); `lib/fetchDetail.ts` encapsula o das
+  3 páginas de detalhe (`video/user/channel [slug]`) — usa `cache()` do React por cima do
+  `fetchJSON` porque passar `timeoutMs` anexa um `AbortSignal`, e isso faz o Next.js pular a
+  deduplicação automática de fetch entre `generateMetadata` e a página (achado do fechamento v4);
+  sem o `cache()`, cada page de detalhe dispararia 2 requests reais por carregamento
 - `types/` — tipos de domínio compartilhados (`VideoData`, `ChannelData`) usados tanto por Server quanto Client Components
 - `hooks/` — `auth.tsx` (autenticação) e `styleSwitcher.tsx` (tema claro/escuro) — client-only, guardados por `isServer()`
 - `styles/css.d.ts` — declaração ambiente (`declare module '*.css'`) para imports de CSS como side-effect (`import './style.css'`) satisfazerem `tsc --noEmit`; o `next build`/`next dev` (webpack) já resolve isso nativamente, sem precisar da declaração
@@ -124,3 +132,12 @@ em `/user`) são buscadas a cada carga logada da rota correspondente, independen
 está ativa — o Radix Tabs só evita re-render client-side da aba inativa, não o fetch
 server-side que já resolveu o Server Component passado como prop. Decisão consciente (sem custo
 de transformação de imagem associado, só requests de dado), não um bug — ver PR #7.
+
+Mesmo trade-off se estende ao timeout de listagem (A4, v4 Etapa 2): a seção de sessão roda no
+mesmo `Promise.all` da listagem pública, então toda vez que a listagem falha (`fetchListing`
+retorna `null`) o fetch/render da seção de sessão já foi disparado em paralelo e é descartado no
+fallback (`if (!trend) return <FeedbackMessage />`). Ir sequencial (só buscar sessão depois de
+confirmar a listagem) eliminaria esse desperdício, mas custaria uma rodada extra de latência no
+caminho comum (listagem OK, que é a maioria dos casos) pra economizar uma request rara (backend
+fora do ar). Mantido paralelo por ser o trade-off menos custoso no caso comum — sinalizado aqui
+pra não ser achado de novo como se fosse regressão não intencional (achado do fechamento v4).

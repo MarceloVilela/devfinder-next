@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { FaYoutube, FaHome } from 'react-icons/fa';
 
-import { fetchJSON } from '../../../lib/fetchJSON';
+import { fetchDetail } from '../../../lib/fetchDetail';
+import { classNames } from '../../../lib/classNames';
+import { DETAIL_ACTION_BUTTON_CLASSNAME } from '../../../lib/detailActionButtonClassName';
 import { Container } from '../../../components';
 import { VideoData } from '../../../types';
 
@@ -11,11 +13,9 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-// A API devolve 200 + corpo `null` quando o vídeo não existe (não 404) — fetchJSON já repassa
-// esse `null` naturalmente. Sem try/catch aqui: erro de rede real (API fora do ar) sobe pro
-// error.tsx em vez de virar "não encontrado" — só ausência de dado vira notFound().
+// Ausência de vídeo (não 404 real, 200 + `null`) vs. erro de rede: ver `lib/fetchDetail.ts`.
 async function getVideo(idYoutubeWatch: string): Promise<VideoData | null> {
-  return fetchJSON<VideoData | null>(`/video/${idYoutubeWatch}`, { cache: 'no-store' });
+  return fetchDetail<VideoData>(`/video/${idYoutubeWatch}`);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -58,7 +58,7 @@ export default async function VideoDetail({ params }: PageProps) {
           >
             <button
               style={{ backgroundColor: "#ff0000" }}
-              className="h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] cursor-pointer text-white flex items-center justify-center w-[270px] mb-6"
+              className={DETAIL_ACTION_BUTTON_CLASSNAME}
             >
               <span className="flex-1 text-left ml-6 uppercase font-bold">Acessar</span>
               <FaYoutube className="text-2xl text-white mx-4 w-8" />
@@ -69,7 +69,7 @@ export default async function VideoDetail({ params }: PageProps) {
             href={'/'}
             rel="noopener noreferrer"
           >
-            <button className="h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] bg-primary-stronger cursor-pointer text-white flex items-center justify-center w-[270px] mb-6">
+            <button className={classNames(DETAIL_ACTION_BUTTON_CLASSNAME, 'bg-primary-stronger')}>
               <span className="flex-1 text-left ml-6 uppercase font-bold">Listar outros</span>
               <FaHome className="text-2xl text-white mx-4 w-8" />
             </button>

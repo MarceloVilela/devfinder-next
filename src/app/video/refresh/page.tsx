@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import { safeCompare } from '../../../lib/safeCompare';
 import RefreshClient from './_components/RefreshClient';
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ interface PageProps {
 export default async function Page({ searchParams }: PageProps) {
   const { token } = await searchParams;
 
-  if (!process.env.VIDEO_REFRESH_TOKEN || token !== process.env.VIDEO_REFRESH_TOKEN) {
+  if (!process.env.VIDEO_REFRESH_TOKEN || !token || !safeCompare(token, process.env.VIDEO_REFRESH_TOKEN)) {
     notFound();
   }
 

@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { VideoData } from '../../types';
+import { classNames } from '../../lib/classNames';
+import { SKELETON_BAR_CLASSNAME, SKELETON_COLOR_CLASSNAME } from '../../lib/skeletonClassName';
 
 interface ItemProps {
   video: VideoData;
@@ -54,16 +56,16 @@ const VideoThumbItem: React.FC<ItemProps> = ({ video, placeholder = false }) => 
         )
         : (
           <li className="placeholder card rounded-[10px] cursor-default">
-            <div className="thumb flex justify-center items-center relative w-full aspect-[16/9] bg-[#ccc] h-[174px]">
+            <div className={classNames('thumb flex justify-center items-center relative w-full aspect-[16/9] h-[174px]', SKELETON_COLOR_CLASSNAME)}>
             </div>
 
             <footer className="container-edge-spacing flex flex-row justify-between flex-1 mt-4 text-left">
-              <div className='avatar w-10 h-10 rounded-full mr-2 bg-[#ccc]'>
+              <div className={classNames('avatar w-10 h-10 rounded-full mr-2', SKELETON_COLOR_CLASSNAME)}>
               </div>
 
               <div className='bio flex flex-1 flex-col'>
-                <p className="h-4 mb-[3px] rounded-[6px] bg-[#ccc]"></p>
-                <p className="h-4 mb-[3px] rounded-[6px] bg-[#ccc]"></p>
+                <p className={SKELETON_BAR_CLASSNAME}></p>
+                <p className={SKELETON_BAR_CLASSNAME}></p>
               </div>
             </footer>
 

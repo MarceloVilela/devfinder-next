@@ -21,7 +21,15 @@ export default function LoginForm() {
     const logout = searchParams?.get('logout');
 
     if (logout) {
-      signOut();
+      // Mesma checagem de Header.tsx (achado #2, code-review Etapa 2): `signOut()` sempre limpa
+      // o estado local mesmo em falha, só retorna `true` se o backend confirmou. `/login` não
+      // renderiza Server Component dependente de sessão, então não há `router.refresh()` aqui —
+      // só o aviso, pra não silenciar uma falha real de logout.
+      signOut().then((confirmedByBackend) => {
+        if (!confirmedByBackend) {
+          toast.error('Não foi possível confirmar o encerramento da sessão com o servidor. Tente novamente.');
+        }
+      });
       return;
     }
 

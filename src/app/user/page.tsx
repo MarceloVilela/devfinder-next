@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
 import { getSessionToken } from '../../lib/fetchSessionJSON';
 import { UserData } from '../../hooks/auth';
 import { FeedbackMessage } from '../../components';
@@ -13,12 +13,6 @@ export const metadata: Metadata = {
   title: 'Usuários',
 };
 
-interface DevsFeed {
-  docs: UserData[];
-  total: number;
-  itemsPerPage: number;
-}
-
 interface PageProps {
   searchParams: Promise<{ page?: string }>;
 }
@@ -30,7 +24,7 @@ export default async function UserListPage({ searchParams }: PageProps) {
   const token = await getSessionToken();
 
   const [devs, liked, disliked] = await Promise.all([
-    fetchListing<DevsFeed>(`/devs?page=${currentPage}`, {
+    fetchListing<ListingFeed<UserData>>(`/devs?page=${currentPage}`, {
       next: { revalidate: 60 * 60 * 8 },
     }),
     token ? UserLiked({ token }) : undefined,

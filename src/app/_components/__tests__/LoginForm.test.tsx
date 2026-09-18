@@ -21,21 +21,37 @@ const mockedUseAuth = useAuth as jest.Mock
 
 describe('LoginForm', () => {
   const push = jest.fn()
-  const signOut = jest.fn()
+  const signOut = jest.fn().mockResolvedValue(true)
 
   beforeEach(() => {
     jest.clearAllMocks()
+    signOut.mockResolvedValue(true)
     mockedUseRouter.mockReturnValue({ push })
   })
 
-  it('faz logout quando a URL tem ?logout e não redireciona pra home', () => {
+  it('faz logout quando a URL tem ?logout e não redireciona pra home', async () => {
     mockedUseSearchParams.mockReturnValue(new URLSearchParams('logout=1'))
     mockedUseAuth.mockReturnValue({ user: null, signOut, message: null, isHydrated: true })
 
     render(<LoginForm />)
+    await Promise.resolve()
 
     expect(signOut).toHaveBeenCalled()
     expect(push).not.toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('avisa quando o backend não confirma o logout (achado #3, fechamento v4)', async () => {
+    signOut.mockResolvedValue(false)
+    mockedUseSearchParams.mockReturnValue(new URLSearchParams('logout=1'))
+    mockedUseAuth.mockReturnValue({ user: null, signOut, message: null, isHydrated: true })
+
+    render(<LoginForm />)
+    await Promise.resolve()
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Não foi possível confirmar o encerramento da sessão com o servidor. Tente novamente.',
+    )
   })
 
   it('redireciona pra home quando a sessão já hidratou com usuário logado', () => {

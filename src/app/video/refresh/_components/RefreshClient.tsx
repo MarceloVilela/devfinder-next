@@ -8,37 +8,36 @@ import api from '../../../../services/api'
 import { Container } from '../../../../components'
 
 type DataRefresh = {
-  errors: any[]
-  videosAdded: any[]
-  videosFounded: any[]
+  errors: unknown[]
+  videosAdded: unknown[]
+  videosFounded: unknown[]
+}
+
+// Repetido em todo handler desta tela antes desta extração (achado do fechamento v4): mesmo
+// formato pending/success/error a partir de um `message`, só a promise muda por chamador.
+function toastPromise<T>(promise: Promise<T>, message: string): Promise<T> {
+  return toast.promise(promise, {
+    pending: `Request ${message}`,
+    success: `Success ${message}`,
+    error: `Error ${message}`,
+  })
 }
 
 export default function RefreshClient() {
-  const [dataFeed, setDataFeed] = useState<any[]>([])
+  const [dataFeed, setDataFeed] = useState<unknown[]>([])
   const [dataRefresh, setDataRefresh] = useState({} as DataRefresh)
   const [screenshots, setScreenshots] = useState<string[]>([])
   const [description, setDescription] = useState('')
 
   const wakeFinder = () => {
-    const message = 'wakeup: finder'
-    toast.promise(api.get('/'), {
-      pending: `Request ${message}`,
-      success: `Success ${message}`,
-      error: `Error ${message}`,
-    })
+    toastPromise(api.get('/'), 'wakeup: finder')
   }
 
   const wakeAuto = () => {
-    const message = 'wakeup: automed browser'
-    toast.promise(Axios.get(process.env.NEXT_PUBLIC_API_AUTO + '/'), {
-      pending: `Request ${message}`,
-      success: `Success ${message}`,
-      error: `Error ${message}`,
-    })
+    toastPromise(Axios.get(process.env.NEXT_PUBLIC_API_AUTO + '/'), 'wakeup: automed browser')
   }
 
   const handleGetFeedSubs = () => {
-    const message = 'refresh: feed-subs'
     const params = {
       auth_method: 'stored',
       width: 3840,
@@ -47,64 +46,45 @@ export default function RefreshClient() {
       user: 'marcelovilela',
     }
 
-    toast.promise(
+    toastPromise(
       Axios.get(process.env.NEXT_PUBLIC_API_AUTO + '/feed/subscriptions', {
         params,
       }).then(() => {
         handleGetFeedAsJson()
       }),
-      {
-        pending: `Request ${message}`,
-        success: `Success ${message}`,
-        error: `Error ${message}`,
-      },
+      'refresh: feed-subs',
     )
   }
 
   const handleGetFeedAsJson = useCallback(() => {
-    const message = 'refresh: finder-jsonbin-creator'
-    toast.promise(
+    toastPromise(
       Axios.get('/api/jsonbin').then(({ data }) => setDataFeed(data)),
-      {
-        pending: `Request ${message}`,
-        success: `Success ${message}`,
-        error: `Error ${message}`,
-      },
+      'refresh: finder-jsonbin-creator',
     )
   }, [])
 
   const handleRefreshFinder = useCallback(() => {
-    const message = 'refresh: finder-create'
-    toast.promise(
+    toastPromise(
       api
         .post('/video/refresh', { record: dataFeed })
         .then(({ data }) => setDataRefresh(data)),
-      {
-        pending: `Request ${message}`,
-        success: `Success ${message}`,
-        error: `Error ${message}`,
-      },
+      'refresh: finder-create',
     )
   }, [dataFeed])
 
   const generateScreenshot = () => {
-    const message = 'generate: screenshot'
     const params = {
       url: 'https://devfinder.vercel.app',
       y: [80, 900, 1700].join(','),
       user: 'marcelovilela',
     }
-    toast.promise(
+    toastPromise(
       Axios.get(process.env.NEXT_PUBLIC_API_AUTO + '/page/screenshot', {
         params,
       }).then(({ data }) => {
         setScreenshots(data)
       }),
-      {
-        pending: `Request ${message}`,
-        success: `Success ${message}`,
-        error: `Error ${message}`,
-      },
+      'generate: screenshot',
     )
   }
 
@@ -136,18 +116,13 @@ export default function RefreshClient() {
   }
 
   const generateDescription = () => {
-    const message = 'generate: description'
-    toast.promise(
+    toastPromise(
       api
         .get('/description/feed')
         .then(({ data }) =>
           setDescription(String(data).replace(/<br \/>/g, '\n')),
         ),
-      {
-        pending: `Request ${message}`,
-        success: `Success ${message}`,
-        error: `Error ${message}`,
-      },
+      'generate: description',
     )
   }
 

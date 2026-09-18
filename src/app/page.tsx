@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, LISTING_UNAVAILABLE_MESSAGE } from '../lib/fetchListing';
+import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../lib/fetchListing';
 import { getSessionToken } from '../lib/fetchSessionJSON';
 import { VideoData } from '../types';
 import { FeedbackMessage } from '../components';
@@ -14,12 +14,6 @@ import Subs from './_components/Subs';
 export const metadata: Metadata = {
   title: `Home | ${process.env.NEXT_PUBLIC_TITLE ?? 'DevFinder'}`,
 };
-
-interface TrendingFeed {
-  docs: VideoData[];
-  total: number;
-  itemsPerPage: number;
-}
 
 interface PageProps {
   // `page` pagina a aba "Explorar" (Trend); `subsPage` pagina a aba "Inscrições" (Subs) —
@@ -35,7 +29,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   const token = await getSessionToken();
 
   const [trend, subs] = await Promise.all([
-    fetchListing<TrendingFeed>(`/feed/trending?page=${currentPage}`, {
+    fetchListing<ListingFeed<VideoData>>(`/feed/trending?page=${currentPage}`, {
       next: { revalidate: 60 * 60 * 8 },
     }),
     token ? Subs({ token, page: currentSubsPage }) : undefined,

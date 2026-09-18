@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { FaGithub, FaHome } from 'react-icons/fa';
 
-import { fetchJSON } from '../../../lib/fetchJSON';
+import { fetchDetail } from '../../../lib/fetchDetail';
+import { classNames } from '../../../lib/classNames';
+import { DETAIL_ACTION_BUTTON_CLASSNAME } from '../../../lib/detailActionButtonClassName';
 import { Container } from '../../../components';
 import { UserData } from '../../../hooks/auth';
 
@@ -11,11 +13,9 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-// A API devolve 200 + corpo `null` quando o dev não existe (não 404) — fetchJSON já repassa
-// esse `null` naturalmente. Sem try/catch aqui: erro de rede real (API fora do ar) sobe pro
-// error.tsx em vez de virar "não encontrado" — só ausência de dado vira notFound().
+// Ausência de dev (não 404 real, 200 + `null`) vs. erro de rede: ver `lib/fetchDetail.ts`.
 async function getUser(username: string): Promise<UserData | null> {
-  return fetchJSON<UserData | null>(`/devs/${username}`, { cache: 'no-store' });
+  return fetchDetail<UserData>(`/devs/${username}`);
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -60,7 +60,7 @@ export default async function UserDetail({ params }: PageProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <button className="h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] bg-primary-stronger cursor-pointer text-white flex items-center justify-center w-[270px] mb-6">
+            <button className={classNames(DETAIL_ACTION_BUTTON_CLASSNAME, 'bg-primary-stronger')}>
               <span className="flex-1 text-left ml-6 uppercase font-bold">Acessar</span>
               <FaGithub className="text-2xl text-white mx-4 w-8" />
             </button>
@@ -70,7 +70,7 @@ export default async function UserDetail({ params }: PageProps) {
             href={'/user'}
             rel="noopener noreferrer"
           >
-            <button className="h-[50px] shadow-[0_2px_2px_0_rgba(0,0,0,0.05)] border-0 rounded-[4px] bg-primary-stronger cursor-pointer text-white flex items-center justify-center w-[270px] mb-6">
+            <button className={classNames(DETAIL_ACTION_BUTTON_CLASSNAME, 'bg-primary-stronger')}>
               <span className="flex-1 text-left ml-6 uppercase font-bold">Listar outros</span>
               <FaHome className="text-2xl text-white mx-4 w-8" />
             </button>

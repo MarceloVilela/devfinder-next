@@ -1,3 +1,9 @@
+// Orçamento padrão pra qualquer fetch que precise falhar rápido em vez de esperar o timeout da
+// plataforma — usado por `fetchListing`, `sessionFetch` e as páginas de detalhe. Único lugar
+// declarado (achado de duplicação, fechamento v4): antes cada camada tinha sua própria cópia do
+// mesmo número.
+export const DEFAULT_FETCH_TIMEOUT_MS = 5000;
+
 export class HTTPError extends Error {
   status: number;
 

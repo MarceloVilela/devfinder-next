@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { ChannelData } from '../../types';
+import { classNames } from '../../lib/classNames';
+import { SKELETON_BAR_CLASSNAME, SKELETON_COLOR_CLASSNAME } from '../../lib/skeletonClassName';
 
 interface ItemProps {
   item: ChannelData;
@@ -40,12 +42,12 @@ const ChannelItem: React.FC<ItemProps> = ({ item, placeholder }) => {
           </li>
         ) : (
           <li className="placeholder card rounded-lg bg-background-weakerer md:bg-inherit">
-            <div className="avatar flex justify-center items-center ml-4 md:ml-0 w-16 h-16 rounded-full bg-[#ccc]">
+            <div className={classNames('avatar flex justify-center items-center ml-4 md:ml-0 w-16 h-16 rounded-full', SKELETON_COLOR_CLASSNAME)}>
             </div>
 
             <aside className="flex flex-col justify-center flex-1 py-[15px] px-5 text-left rounded-b-[5px]">
-              <p className="h-4 mb-[3px] rounded-[6px] bg-[#ccc]"></p>
-              <p className="h-4 mb-[3px] rounded-[6px] bg-[#ccc]"></p>
+              <p className={SKELETON_BAR_CLASSNAME}></p>
+              <p className={SKELETON_BAR_CLASSNAME}></p>
             </aside>
           </li>
         )}

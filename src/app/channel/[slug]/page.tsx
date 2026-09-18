@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 
-import { fetchJSON } from '../../../lib/fetchJSON';
-import { Container } from '../../../components';
+import { fetchDetail } from '../../../lib/fetchDetail';
+import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../../lib/fetchListing';
+import { Container, FeedbackMessage } from '../../../components';
 import { ChannelData, VideoData } from '../../../types';
 import './style.css';
 import ChannelLikeButtons from '../../_components/ChannelLikeButtons';
@@ -15,23 +16,18 @@ interface PageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
-interface ChannelFeed {
-  docs: VideoData[];
-  total: number;
-  itemsPerPage: number;
-}
-
-// A API devolve 200 + corpo `null` quando o canal não existe (não 404) — fetchJSON já repassa
-// esse `null` naturalmente. Sem try/catch aqui: erro de rede real (API fora do ar) sobe pro
-// error.tsx em vez de virar "não encontrado" — só ausência de dado vira notFound().
+// Ausência de canal (não 404 real, 200 + `null`) vs. erro de rede: ver `lib/fetchDetail.ts`.
 async function getChannel(searchQuery: string): Promise<ChannelData | null> {
-  return fetchJSON<ChannelData | null>(`/channels/${searchQuery}`, { cache: 'no-store' });
+  return fetchDetail<ChannelData>(`/channels/${searchQuery}`);
 }
 
-async function getChannelFeed(channelName: string, page: number): Promise<ChannelFeed> {
-  return fetchJSON<ChannelFeed>(
+// Ao contrário de getChannel, o feed do canal não tem semântica de "não encontrado" — mesmo
+// canal com feed vazio ainda é uma resposta válida. Usa `fetchListing` (mesmo padrão das 4
+// listagens públicas: catch + null + log) em vez de deixar timeout virar error.tsx cru (achado
+// do fechamento v4 — a versão anterior deste código tinha `timeoutMs` sem nenhum catch).
+async function getChannelFeed(channelName: string, page: number): Promise<ListingFeed<VideoData> | null> {
+  return fetchListing<ListingFeed<VideoData>>(
     `/feed/channel?channel_name=${encodeURIComponent(channelName)}&page=${page}`,
-    { cache: 'no-store' },
   );
 }
 
@@ -57,7 +53,13 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
     notFound();
   }
 
-  const { docs, total, itemsPerPage } = await getChannelFeed(channel.name, currentPage);
+  const feed = await getChannelFeed(channel.name, currentPage);
+
+  if (!feed) {
+    return <FeedbackMessage message={LISTING_UNAVAILABLE_MESSAGE} />;
+  }
+
+  const { docs, total, itemsPerPage } = feed;
 
   return (
     <Container loading={false} className="containerVerticalCenter">
