@@ -3,9 +3,15 @@ import { toast } from 'react-toastify'
 import { isServer } from '../utils';
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
-    // sessão vive num cookie httpOnly no backend — precisa disso pro browser enviar o cookie
-    // em requests cross-origin (frontend e backend em portas/domínios diferentes)
+    // `/backend` (relativo, same-origin) em vez de `NEXT_PUBLIC_API_URL` direto — passa pelo
+    // proxy reverso do `next.config.js` (review-human.md #2) em vez de bater cross-origin no
+    // Render. Precisa subir junto da troca do callback OAuth no GitHub (painel, manual): até lá,
+    // o cookie de sessão continua nascendo em `onrender.com`, e chamada aqui pra `/backend/*`
+    // (que o browser vê como `vercel.app`) não teria esse cookie pra enviar — ver sequência de
+    // deploy em review-human.md #2.
+    baseURL: '/backend',
+    // sessão vive num cookie httpOnly no backend — same-origin já manda cookie sozinho, mas
+    // manter não atrapalha (só importa de verdade em request cross-origin).
     withCredentials: true,
 })
 

@@ -25,7 +25,28 @@ const nextConfig = {
       { protocol: 'https', hostname: 'yt3.ggpht.com' },
       { protocol: 'https', hostname: 'yt3.googleusercontent.com' },
     ],
-  }
+  },
+
+  // Proxy reverso pro backend (review-human.md #2) — faz o navegador só falar com o domínio do
+  // frontend, nunca direto com o Render. Sem isso, o cookie de sessão httpOnly que o backend
+  // seta na resposta do OAuth nasce escopado ao domínio do backend (`onrender.com`), e nunca
+  // chega no `next/headers` `cookies()` que os Server Components leem (domínios sem sufixo
+  // compartilhado) — as seções de sessão (Subs/UserLiked/UserDisliked) somem em produção mesmo
+  // com o usuário logado. Prefixo `/backend` (não `/api`) de propósito: `/api/jsonbin.ts`
+  // (Pages Router, rota legada) já ocupa `/api/*` — um rewrite `/api/:path*` engoliria essa rota.
+  // Sozinho, este rewrite não tem efeito nenhum (nada chama `/backend/*` ainda) — só passa a
+  // valer quando `services/api.ts` apontar pra cá E o callback OAuth no GitHub for atualizado
+  // pra `https://devfinder.vercel.app/backend/auth/github/callback` (painel do GitHub, manual,
+  // fora deste repo) — as duas pontas precisam subir juntas, senão o login quebra no meio do
+  // caminho (ver "Passos" em review-human.md #2).
+  async rewrites() {
+    return [
+      {
+        source: '/backend/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
