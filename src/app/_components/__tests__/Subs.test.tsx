@@ -3,6 +3,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 import Subs from '../Subs'
 import { fetchSessionJSON, redirectIfSessionExpired } from '../../../lib/fetchSessionJSON'
+import { SESSION_FETCH_TIMEOUT_MS } from '../sessionFetch'
 
 jest.mock('../../../lib/fetchSessionJSON', () => ({
   fetchSessionJSON: jest.fn(),
@@ -37,7 +38,7 @@ describe('Subs (Server Component)', () => {
     const jsx = await Subs({ token: 'abc123', page: 2 })
     render(jsx)
 
-    expect(mockedFetchSessionJSON).toHaveBeenCalledWith('/feed/subscriptions?page=2', 'abc123')
+    expect(mockedFetchSessionJSON).toHaveBeenCalledWith('/feed/subscriptions?page=2', 'abc123', SESSION_FETCH_TIMEOUT_MS)
     expect(screen.getByText('Video 1')).toBeInTheDocument()
   })
 

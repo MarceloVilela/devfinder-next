@@ -9,10 +9,11 @@ import {
   FaGithub,
   FaHome,
   FaSearch,
-  // FaSignOutAlt, 
+  FaSignOutAlt,
   FaUserCircle
 } from 'react-icons/fa';
 import { ActionMeta, GetOptionLabel, SingleValue } from 'react-select';
+import { toast } from 'react-toastify';
 // ssr:false porque react-select gera ids aleatórios que dão mismatch de hidratação — o
 // `loading` abaixo ocupa o mesmo espaço (mesmo seletor CSS `section > div`) antes do chunk
 // carregar, pra não sumir/dar flick na barra de busca (só falta a interatividade por um instante).
@@ -23,6 +24,7 @@ const AsyncSelect = dynamic(() => import("react-select/async"), {
 
 import './style.css';
 import api from '../../services/api';
+import { useAuth, isLoggedIn } from '../../hooks/auth';
 
 type Option = {
   value: string;
@@ -32,6 +34,7 @@ type Option = {
 
 export default function Header() {
   const router = useRouter();
+  const { user, signOut, isHydrated } = useAuth();
 
   const [inputValue, setValue] = useState('');
   const [selectedValue, setSelectedValue] = useState<Option>({} as Option);
@@ -66,6 +69,24 @@ export default function Header() {
       .then(({ data }) => data.map(({ value, label, type }: Option) => formatOption({ value, label, type })));
   };
 
+  // router.refresh() reexecuta os Server Components da rota atual (Subs/UserLiked/UserDisliked
+  // já vieram renderizados no HTML antes do clique) com o cookie de sessão já limpo — sem isso,
+  // as seções personalizadas ficam visíveis na tela até a próxima navegação, mesmo com a sessão
+  // já encerrada. Só faz sentido reexecutar se o backend confirmou o logout (signOut() sempre
+  // limpa o estado local mesmo em falha, mas só retorna `true` se o cookie foi de fato limpo no
+  // servidor) — sem essa checagem, um `/auth/logout` que falhou reexecutaria os Server
+  // Components com o cookie ainda válido, mostrando dado de quem "saiu" ao lado de um header que
+  // já diz "Entrar" (achado #2, code-review Etapa 2).
+  const handleSignOut = async () => {
+    const confirmedByBackend = await signOut();
+
+    if (confirmedByBackend) {
+      router.refresh();
+    } else {
+      toast.error('Não foi possível confirmar o encerramento da sessão com o servidor. Tente novamente.');
+    }
+  };
+
   return (
     <header className="header-wrapper">
       <section>
@@ -98,10 +119,25 @@ export default function Header() {
               <span>Canais</span>
           </Link>
 
-          <Link href={`/login?logout=1`}>
+          {!isHydrated ? (
+            // Placeholder invisível com o mesmo espaço reservado do item real — evita o flash
+            // "Entrar" -> "Sair" enquanto a sessão ainda hidrata (GET /me em andamento), mesma
+            // técnica do `loading` do AsyncSelect logo acima (achado #5, code-review Etapa 2).
+            <span aria-hidden="true" className="invisible ml-4 flex flex-col items-center text-[0.8rem]">
               <FaUserCircle />
-              <span>Conta</span>
-          </Link>
+              <span>Entrar</span>
+            </span>
+          ) : isLoggedIn(user) ? (
+            <button type="button" onClick={handleSignOut}>
+              <FaSignOutAlt />
+              <span>Sair</span>
+            </button>
+          ) : (
+            <Link href={`/login`}>
+                <FaUserCircle />
+                <span>Entrar</span>
+            </Link>
+          )}
 
         </nav >
       </section >

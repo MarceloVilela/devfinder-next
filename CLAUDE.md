@@ -42,10 +42,14 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
   - `page.tsx`, `video/page.tsx`, `user/page.tsx`, `channel/page.tsx` — listagens, Server Component com `fetch` + ISR de 8h
   - `user/[slug]/page.tsx`, `video/[slug]/page.tsx`, `channel/[slug]/page.tsx` — detalhe, Server Component renderizado por request (`cache: 'no-store'`, sem `generateStaticParams` — o conjunto de slugs é aberto); usam `generateMetadata` para título dinâmico
   - `login/page.tsx` — client-only (fluxo OAuth)
-  - `video/refresh/page.tsx` — Server Component só com `metadata` (`robots: noindex,nofollow`);
-    a lógica em si (dashboard de ações manuais) é `_components/RefreshClient.tsx`.
-    `video/refresh` é ferramenta operacional de uso interno (disparar reprocessamento do feed),
-    não faz parte do produto público e não é linkada a partir de nenhuma navegação visível
+  - `video/refresh/page.tsx` — Server Component com `metadata` (`robots: noindex,nofollow`) **e**
+    o gate de acesso (A3, v4 Etapa 2): compara `?token=` com `process.env.VIDEO_REFRESH_TOKEN`
+    (server-only) e chama `notFound()` se não bater — única exceção ao padrão "página só com
+    metadata" nesta lista, por ser controle de acesso da própria rota, não dado de negócio. A
+    lógica de negócio (dashboard de ações manuais) continua isolada em
+    `_components/RefreshClient.tsx`. `video/refresh` é ferramenta operacional de uso interno
+    (disparar reprocessamento do feed), não faz parte do produto público e não é linkada a
+    partir de nenhuma navegação visível
   - `_components/` — filhos das rotas Server, mistura Server e Client Component conforme
     precisa de interatividade ou não: `UserLiked`/`UserDisliked`/`Subs` (dado por sessão) são
     Server Component, igual às listagens/detalhe públicos; `UserTabs`/`HomeFeed` (abas Radix),

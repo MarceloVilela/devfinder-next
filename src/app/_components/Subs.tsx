@@ -2,7 +2,7 @@ import { Container, Paginate, VideoThumbItem } from '../../components';
 import { VideoData } from '../../types';
 import { VideoList } from '../video/style';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
-import { resolveSessionSection } from './sessionFetch';
+import { resolveSessionSection, SESSION_FETCH_TIMEOUT_MS } from './sessionFetch';
 
 interface SubsFeed {
   docs: VideoData[];
@@ -20,7 +20,7 @@ interface SubsProps {
 // Paginate `pageParam` e app/page.tsx).
 export default async function Subs({ token, page }: SubsProps) {
   return resolveSessionSection(
-    () => fetchSessionJSON<SubsFeed>(`/feed/subscriptions?page=${page}`, token),
+    () => fetchSessionJSON<SubsFeed>(`/feed/subscriptions?page=${page}`, token, SESSION_FETCH_TIMEOUT_MS),
     'Não foi possível carregar suas inscrições agora.',
     ({ docs, total, itemsPerPage }) => (
       <Container loading={false} unstylized className="container-full-width">

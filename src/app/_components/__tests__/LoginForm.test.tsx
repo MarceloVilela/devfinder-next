@@ -10,7 +10,10 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(),
 }))
 jest.mock('react-toastify', () => ({ toast: { error: jest.fn() } }))
-jest.mock('../../../hooks/auth', () => ({ useAuth: jest.fn() }))
+jest.mock('../../../hooks/auth', () => ({
+  useAuth: jest.fn(),
+  isLoggedIn: (user: { _id?: string }) => Boolean(user?._id),
+}))
 
 const mockedUseRouter = useRouter as jest.Mock
 const mockedUseSearchParams = useSearchParams as jest.Mock

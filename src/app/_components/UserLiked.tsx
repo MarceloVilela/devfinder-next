@@ -2,7 +2,7 @@ import { Container } from '../../components';
 import { UserData } from '../../hooks/auth';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
 import { UndoableUserCard } from './UndoableUserCard';
-import { resolveSessionSection } from './sessionFetch';
+import { resolveSessionSection, SESSION_FETCH_TIMEOUT_MS } from './sessionFetch';
 
 interface UserLikedProps {
   token: string;
@@ -13,7 +13,7 @@ interface UserLikedProps {
 // sentido aqui: quem não tem sessão nunca chega a instanciar este componente.
 export default async function UserLiked({ token }: UserLikedProps) {
   return resolveSessionSection(
-    () => fetchSessionJSON<UserData[]>('/likes/devs', token),
+    () => fetchSessionJSON<UserData[]>('/likes/devs', token, SESSION_FETCH_TIMEOUT_MS),
     'Não foi possível carregar seus favoritos agora.',
     (docs) => (
       <Container loading={false} unstylized className="container-full-width">

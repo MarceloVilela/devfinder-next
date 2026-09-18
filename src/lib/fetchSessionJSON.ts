@@ -12,10 +12,11 @@ export async function getSessionToken(): Promise<string | undefined> {
 
 // cache: 'no-store' — dado por sessão nunca pode entrar no cache de fetch do Next (duas
 // pessoas acessando a mesma rota receberiam a resposta cacheada de quem passou primeiro).
-export async function fetchSessionJSON<T>(path: string, token: string): Promise<T> {
+export async function fetchSessionJSON<T>(path: string, token: string, timeoutMs?: number): Promise<T> {
   return fetchJSON<T>(path, {
     cache: 'no-store',
     headers: { Cookie: `${SESSION_COOKIE}=${token}` },
+    timeoutMs,
   });
 }
 

@@ -62,6 +62,16 @@ describe('fetchSessionJSON', () => {
 
     await expect(fetchSessionJSON('/likes/devs', 'abc123')).rejects.toThrow();
   });
+
+  it('encaminha timeoutMs pro fetch subjacente como AbortSignal (achado #1, code-review Etapa 2)', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+    global.fetch = mockFetch as unknown as typeof fetch;
+
+    await fetchSessionJSON('/likes/devs', 'abc123', 5000);
+
+    const [, init] = mockFetch.mock.calls[0];
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
 });
 
 describe('redirectIfSessionExpired', () => {

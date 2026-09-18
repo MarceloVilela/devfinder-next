@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
 
-import { useAuth } from '../../hooks/auth';
+import { useAuth, isLoggedIn } from '../../hooks/auth';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function LoginForm() {
       return;
     }
 
-    if (isHydrated && user && Object.keys(user).includes('_id')) {
+    if (isHydrated && isLoggedIn(user)) {
       router.push('/');
     }
   }, [user, router, isHydrated, searchParams, signOut])

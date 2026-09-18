@@ -2,7 +2,7 @@ import { Container } from '../../components';
 import { UserData } from '../../hooks/auth';
 import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
 import { UndoableUserCard } from './UndoableUserCard';
-import { resolveSessionSection } from './sessionFetch';
+import { resolveSessionSection, SESSION_FETCH_TIMEOUT_MS } from './sessionFetch';
 
 interface UserDislikedProps {
   token: string;
@@ -11,7 +11,7 @@ interface UserDislikedProps {
 // Server Component (M1, etapa 2 v3) — ver comentário equivalente em UserLiked.tsx.
 export default async function UserDisliked({ token }: UserDislikedProps) {
   return resolveSessionSection(
-    () => fetchSessionJSON<UserData[]>('/dislikes/devs', token),
+    () => fetchSessionJSON<UserData[]>('/dislikes/devs', token, SESSION_FETCH_TIMEOUT_MS),
     'Não foi possível carregar sua lista de não seguidos agora.',
     (docs) => (
       <Container loading={false} unstylized className="container-full-width">

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 
 import UserDisliked from '../UserDisliked'
 import { fetchSessionJSON, redirectIfSessionExpired } from '../../../lib/fetchSessionJSON'
+import { SESSION_FETCH_TIMEOUT_MS } from '../sessionFetch'
 
 jest.mock('../../../lib/fetchSessionJSON', () => ({
   fetchSessionJSON: jest.fn(),
@@ -28,7 +29,7 @@ describe('UserDisliked (Server Component)', () => {
     const jsx = await UserDisliked({ token: 'abc123' })
     render(jsx)
 
-    expect(mockedFetchSessionJSON).toHaveBeenCalledWith('/dislikes/devs', 'abc123')
+    expect(mockedFetchSessionJSON).toHaveBeenCalledWith('/dislikes/devs', 'abc123', SESSION_FETCH_TIMEOUT_MS)
     expect(screen.getByText('Dev User')).toBeInTheDocument()
     expect(screen.getByText('Desmarcar')).toBeInTheDocument()
   })

@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 
-import { useAuth, hydrateAuth, UserData } from '../auth'
+import { useAuth, hydrateAuth, isLoggedIn, UserData } from '../auth'
 import authReducer from '../../store/slices/authSlice'
 import apiDefault from '../../services/api'
 
@@ -60,6 +60,36 @@ describe('useAuth', () => {
     await act(async () => result.current.signOut())
 
     expect(result.current.user).toEqual({})
+  })
+
+  it('signOut retorna true quando o backend confirma o logout', async () => {
+    api.post.mockResolvedValueOnce({})
+    const { result } = renderUseAuth()
+
+    let confirmed: boolean | undefined
+    await act(async () => { confirmed = await result.current.signOut() })
+
+    expect(confirmed).toBe(true)
+  })
+
+  it('signOut retorna false quando o backend falha (achado #2, code-review Etapa 2)', async () => {
+    api.post.mockRejectedValueOnce(new Error('network error'))
+    const { result } = renderUseAuth()
+
+    let confirmed: boolean | undefined
+    await act(async () => { confirmed = await result.current.signOut() })
+
+    expect(confirmed).toBe(false)
+  })
+})
+
+describe('isLoggedIn', () => {
+  it('é true quando o user tem _id', () => {
+    expect(isLoggedIn(user)).toBe(true)
+  })
+
+  it('é false pro estado inicial vazio ({})', () => {
+    expect(isLoggedIn({} as UserData)).toBe(false)
   })
 })
 

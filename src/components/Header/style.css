@@ -51,12 +51,18 @@
 /* Ícone em cima do texto, centralizado — em todas as larguras (pedido do usuário, igual aos
    ícones de rodapé do YouTube). Precisa de flex explícito: o preflight do Tailwind põe svg em
    display:block (o browser usa inline por padrão), então sem isso o ícone e o texto nem ficariam
-   empilhados de forma previsível/centralizada. */
-.header-wrapper section nav a {
-  @apply no-underline text-[#ccc] ml-4 text-[0.8rem] flex flex-col items-center;
+   empilhados de forma previsível/centralizada.
+   Regra estendida pra `button` (item "Sair", A2) — mesmo visual do resto do nav, mas sem
+   navegação: reset de estilo nativo de botão (borda/fundo/fonte) pra ficar indistinguível dos
+   itens `Link`. */
+.header-wrapper section nav a,
+.header-wrapper section nav button {
+  @apply no-underline text-[#ccc] ml-4 text-[0.8rem] flex flex-col items-center bg-transparent border-none p-0 cursor-pointer;
+  font: inherit;
 }
 
-.header-wrapper section nav a span {
+.header-wrapper section nav a span,
+.header-wrapper section nav button span {
   @apply -mt-1;
 }
 

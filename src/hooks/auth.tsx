@@ -8,6 +8,12 @@ import type { AppDispatch } from '../store';
 
 export type { UserData };
 
+// Fonte única pra "usuário tem sessão" — `user` nunca é null/undefined (default `{}` no slice),
+// então checar presença de `_id` é o jeito correto de diferenciar visitante de logado.
+// Compartilhado entre Header e LoginForm (antes cada um checava de um jeito diferente — achado
+// #9, code-review Etapa 2).
+export const isLoggedIn = (user: UserData): boolean => Boolean(user?._id);
+
 // Sessão vive só no cookie httpOnly do backend — nunca em localStorage/JS. Hidratar a sessão
 // é perguntar ao backend "quem sou eu" (o cookie vai junto sozinho); um 401 aqui só significa
 // visitante anônimo, não erro (ver isSessionCheck em services/api.ts).
@@ -35,12 +41,17 @@ function useAuth() {
   const { user, message, isHydrated } = useAppSelector((state) => state.auth);
 
   const signOut = useCallback(async () => {
-    if (isServer()) return;
+    if (isServer()) return false;
 
-    // cookie é httpOnly, só o backend consegue limpar
-    await api.post('/auth/logout').catch(() => {});
+    // cookie é httpOnly, só o backend consegue limpar; o estado client-side é limpo de
+    // qualquer forma (permite ao usuário "esquecer" a sessão local mesmo com o backend fora do
+    // ar) — o retorno diz pro chamador se o backend confirmou, pra decidir se é seguro
+    // reexecutar Server Components que dependem do cookie (ver Header, A2/code-review Etapa 2).
+    const confirmedByBackend = await api.post('/auth/logout').then(() => true).catch(() => false);
 
     dispatch(authActions.signOut());
+
+    return confirmedByBackend;
   }, [dispatch]);
 
   const socialAuthCallback = useCallback(({ user }: { user: UserData }) => {
