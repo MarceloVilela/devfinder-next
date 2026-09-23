@@ -1,24 +1,60 @@
-import { Container } from '../../components';
-import { UserData } from '../../hooks/auth';
-import { fetchSessionJSON } from '../../lib/fetchSessionJSON';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+
+import api from '../../services/api';
+import { useAuth, isLoggedIn, UserData } from '../../hooks/auth';
+import { Container, UserItem } from '../../components';
+import { makePlaceholders } from '../../utils';
 import { UndoableUserCard } from './UndoableUserCard';
-import { resolveSessionSection, SESSION_FETCH_TIMEOUT_MS } from './sessionFetch';
+import { SessionErrorFallback } from './SessionErrorFallback';
 
-interface UserLikedProps {
-  token: string;
-}
+const PLACEHOLDER_COUNT = 6;
 
-// Server Component (M1, etapa 2 v3) — só renderiza quando há token (isLoggedIn decidido no
-// pai, user/page.tsx), então o guard de visitante que existia na versão CSR não faz mais
-// sentido aqui: quem não tem sessão nunca chega a instanciar este componente.
-export default async function UserLiked({ token }: UserLikedProps) {
-  return resolveSessionSection(
-    () => fetchSessionJSON<UserData[]>('/likes/devs', token, SESSION_FETCH_TIMEOUT_MS),
-    'Não foi possível carregar seus favoritos agora.',
-    (docs) => (
-      <Container loading={false} unstylized className="container-full-width">
-        <ul className="users list-flex-row list-none">
-          {docs.map((user) => (
+// Client Component (voltou a ser CSR — ver comentário equivalente em Subs.tsx). Sem paginação
+// (o endpoint `/likes/devs` sempre devolveu a lista inteira, sem `page`/`total` — mantido igual
+// à versão Server Component anterior).
+export default function UserLiked() {
+  const { user, isHydrated } = useAuth();
+  const loggedIn = isHydrated && isLoggedIn(user);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [docs, setDocs] = useState<UserData[]>([]);
+
+  useEffect(() => {
+    if (!loggedIn) return;
+
+    let cancelled = false;
+
+    api.get<UserData[]>('/likes/devs')
+      .then(({ data }) => {
+        if (cancelled) return;
+        setDocs(data);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [loggedIn]);
+
+  if (error) {
+    return <SessionErrorFallback message="Não foi possível carregar seus favoritos agora." />;
+  }
+
+  return (
+    <Container loading={false} unstylized className="container-full-width">
+      <ul className="users list-flex-row list-none">
+        {loading
+          ? makePlaceholders<UserData>(PLACEHOLDER_COUNT).map((user, index) => (
+            <UserItem key={index} user={user} placeholder />
+          ))
+          : docs.map((user) => (
             <UndoableUserCard
               key={user._id}
               user={user}
@@ -28,8 +64,7 @@ export default async function UserLiked({ token }: UserLikedProps) {
               kind="like"
             />
           ))}
-        </ul>
-      </Container>
-    ),
+      </ul>
+    </Container>
   );
 }

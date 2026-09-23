@@ -1,44 +1,35 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, ListingFeed } from '../../lib/fetchListing';
-import { getSessionToken } from '../../lib/fetchSessionJSON';
+import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE, LISTING_COLD_START_TIMEOUT_MS } from '../../lib/fetchListing';
 import { VideoData } from '../../types';
+import { FeedbackMessage } from '../../components';
 import HomeFeed from '../_components/HomeFeed';
 import Trend from '../_components/Trend';
-import Subs from '../_components/Subs';
 
 export const metadata: Metadata = {
   title: 'Vídeos',
 };
 
-interface PageProps {
-  // Mesma ressalva de app/page.tsx: `page` pagina Trend/Explorar, `subsPage` pagina
-  // Subs/Inscrições — chaves diferentes na mesma rota.
-  searchParams: Promise<{ page?: string; subsPage?: string }>;
-}
+// Ver comentário em app/page.tsx (acompanha LISTING_COLD_START_TIMEOUT_MS).
+export const maxDuration = 60;
 
-export default async function VideoListPage({ searchParams }: PageProps) {
-  const { page, subsPage } = await searchParams;
-  const currentPage = Number(page) || 1;
-  const currentSubsPage = Number(subsPage) || 1;
+// Sem `searchParams` nem `cookies()` — ver comentário em app/page.tsx (mesma reversão de M1,
+// etapa 2 v3; esta rota é a mesma listagem de trending que "/", só numa URL própria).
+export default async function VideoListPage() {
+  const trend = await fetchListing<ListingFeed<VideoData>>('/feed/trending?page=1', {
+    next: { revalidate: 60 * 60 * 8 },
+    timeoutMs: LISTING_COLD_START_TIMEOUT_MS,
+  }).catch(() => null);
 
-  const token = await getSessionToken();
-
-  const [trend, subs] = await Promise.all([
-    fetchListing<ListingFeed<VideoData>>(`/feed/trending?page=${currentPage}`, {
-      next: { revalidate: 60 * 60 * 8 },
-    }),
-    token ? Subs({ token, page: currentSubsPage }) : undefined,
-  ]);
+  if (!trend) {
+    return <FeedbackMessage message={LISTING_UNAVAILABLE_MESSAGE} />;
+  }
 
   const { docs, total, itemsPerPage } = trend;
 
   return (
-    <HomeFeed
-      isLoggedIn={!!token}
-      subs={subs}
-    >
-      <Trend docsStatic={docs} totalStatic={total} itemsPerPageStatic={itemsPerPage} page={currentPage} />
+    <HomeFeed>
+      <Trend docsStatic={docs} totalStatic={total} itemsPerPageStatic={itemsPerPage} />
     </HomeFeed>
   );
 }

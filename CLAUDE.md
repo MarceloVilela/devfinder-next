@@ -39,7 +39,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
   - `layout.tsx` — layout raiz (`<html>/<body>`, fontes, metadata base)
   - `providers.tsx` — `'use client'`: Redux, hidratação de auth/tema, `ToastContainer`
   - `not-found.tsx`, `error.tsx` — páginas de erro (404/500)
-  - `page.tsx`, `video/page.tsx`, `user/page.tsx`, `channel/page.tsx` — listagens, Server Component com `fetch` + ISR de 8h
+  - `page.tsx`, `video/page.tsx`, `user/page.tsx`, `channel/page.tsx` — listagens, Server Component com `fetch` + ISR de 8h, sempre só da página 1 (ver "Regra de renderização" abaixo — página 2+ é CSR)
   - `user/[slug]/page.tsx`, `video/[slug]/page.tsx`, `channel/[slug]/page.tsx` — detalhe, Server Component renderizado por request (`cache: 'no-store'`, sem `generateStaticParams` — o conjunto de slugs é aberto); usam `generateMetadata` para título dinâmico
   - `login/page.tsx` — client-only (fluxo OAuth)
   - `video/refresh/page.tsx` — Server Component com `metadata` (`robots: noindex,nofollow`) **e**
@@ -50,12 +50,13 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
     `_components/RefreshClient.tsx`. `video/refresh` é ferramenta operacional de uso interno
     (disparar reprocessamento do feed), não faz parte do produto público e não é linkada a
     partir de nenhuma navegação visível
-  - `_components/` — filhos das rotas Server, mistura Server e Client Component conforme
-    precisa de interatividade ou não: `UserLiked`/`UserDisliked`/`Subs` (dado por sessão) são
-    Server Component, igual às listagens/detalhe públicos; `UserTabs`/`HomeFeed` (abas Radix),
-    `UndoableUserCard` (botão "Desmarcar"), `ChannelLikeButtons`/`UserLikeButtons`, formulário
-    de login e dashboard de `video/refresh` são `'use client'` — só a folha interativa, nunca a
-    árvore de busca de dado (ver "Regra de renderização" abaixo)
+  - `_components/` — filhos das rotas Server. `Trend`/`UserAll` (listagem pública além da
+    página 1) e `UserLiked`/`UserDisliked`/`Subs` (dado por sessão) são `'use client'` — buscam
+    via `services/api.ts` (axios) no próprio componente, não recebem dado pronto do pai (ver
+    "Regra de renderização" abaixo); `UserTabs`/`HomeFeed` (abas Radix, decidem visibilidade das
+    abas de sessão via `useAuth()`), `UndoableUserCard` (botão "Desmarcar"),
+    `ChannelLikeButtons`/`UserLikeButtons`, formulário de login e dashboard de `video/refresh`
+    também são `'use client'`
 - `pages/api/` — Route Handler legado (Pages API route: `jsonbin`) — mantido fora do App Router
   porque só lê segredo de servidor puro (master key do JSONBin) sem estado de sessão do usuário,
   sem necessidade real de virar Route Handler do App Router; coexiste com `app/` sem conflito
@@ -63,7 +64,9 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
 - `lib/fetchJSON.ts` — helper tipado de `fetch` para uso em Server Component, com timeout opcional
   (`timeoutMs`) via `DEFAULT_FETCH_TIMEOUT_MS`; `lib/fetchListing.ts` encapsula o padrão das 4
-  listagens públicas (timeout + catch + fallback amigável); `lib/fetchDetail.ts` encapsula o das
+  listagens públicas (timeout + log da falha + override de `timeoutMs` por chamador — ver
+  "Dados externos" abaixo pra timeout/fallback/`maxDuration`, iguais nas 4 desde a reversão de
+  M1); `lib/fetchDetail.ts` encapsula o das
   3 páginas de detalhe (`video/user/channel [slug]`) — usa `cache()` do React por cima do
   `fetchJSON` porque passar `timeoutMs` anexa um `AbortSignal`, e isso faz o Next.js pular a
   deduplicação automática de fetch entre `generateMetadata` e a página (achado do fechamento v4);
@@ -75,16 +78,42 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
 
 ### Regra de renderização
 
-SSR/ISR para **todas** as rotas — listagem (N registros), detalhe (1 registro) **e** as telas
-que dependem da sessão do usuário logado (favoritos, não seguidos, inscrições). A sessão vive
-num cookie `httpOnly` setado pelo backend; o Server Component lê esse cookie via `next/headers`
-(`cookies()`, `lib/fetchSessionJSON.ts`) e o reenvia manualmente no `fetch` pro backend — o
-`fetch` nativo do servidor não herda cookies do navegador automaticamente. Só a interatividade em
-si (toggle de like/dislike, botão de desmarcar, paginação) fica em Client Components na folha da
-árvore — a busca de dado, incluindo a personalizada, é Server Component. Detalhe completo em
-`../reactjs/improvements/v1/devfinder-next/devfinder-next-app-router-migration.md` (estado
-anterior a esta migração) e `../reactjs/improvements/v3/devfinder-next/2-debito-arquitetural.md`
-(M1, a migração em si).
+SSR/ISR só pra **página 1 da listagem pública** (`/`, `/video`, `/user`, `/channel`) e pras 3
+páginas de detalhe (1 registro, `cache: 'no-store'`). Página 2+ da listagem pública e tudo que
+depende da sessão do usuário logado (favoritos, não seguidos, inscrições) é CSR — `Trend`/
+`UserAll`/`Subs`/`UserLiked`/`UserDisliked` são `'use client'` e buscam via `services/api.ts`
+(axios). Reversão consciente de M1 (etapa 2 v3, que tinha movido a sessão pra Server Component):
+ler `cookies()` **ou** `searchParams` num Server Component força a rota inteira a renderização
+dinâmica no App Router — as 3 rotas que precisavam de um dos dois (cookie pra sessão,
+`searchParams` pra paginação) ficavam sempre `ƒ Dynamic`, nunca `○ Static`, acoplando toda visita
+comum à disponibilidade do backend (Render free tier, cold start reportado em ~30-60s — ver
+`docs/limitacoes-conhecidas.md`), sintoma reproduzido em produção em 2026-09-22 como "home sem
+registros". A sessão vive num cookie `httpOnly` setado pelo backend; o axios (`withCredentials`)
+já manda esse cookie sozinho em toda request — nunca precisou de `cookies()`/`next/headers` pra
+isso, só precisava saber que era esse o mecanismo (achado H2, etapa 2 v3: a razão documentada na
+época, sessão em `localStorage`, estava errada). `useAuth()`/`isHydrated` (hook client-only,
+`hooks/auth.tsx`) decide a visibilidade das abas de sessão (`HomeFeed`/`UserTabs`) — flash
+aceito: a aba de sessão aparece um instante depois do primeiro paint pra quem está logado, em vez
+de já vir pronta no HTML; a aba pública nunca espera hidratação (não repete o achado 4 daquela
+etapa, que escondia a página inteira até hidratar). `Subs`/`UserLiked`/`UserDisliked` só montam
+(e só buscam) dentro da aba de sessão correspondente — Radix `Tabs.Content` desmonta conteúdo de
+aba inativa por padrão (sem `forceMount`), então isso elimina de graça o desperdício de fetch
+"toda carga logada, mesmo com a aba fechada" que a versão Server Component antiga tinha (trade-off
+documentado como aceito, PR #7 — não existe mais, não precisa ser vigiado de novo). Custo aceito
+na paginação: `?page=N` deixa de ser link direto/compartilhável pra uma página específica da
+listagem pública — volta a ser só estado local, como era antes da Etapa 2 v3 (`Paginate` com
+`handlePaginate`, sem navegação por URL). `Paginate` chama `useSearchParams()` incondicionalmente
+mesmo em modo controlado — cada uso dela dentro de `Trend`/`UserAll`/`Subs` fica envolto em
+`<Suspense>` local, exigência do App Router pra essa API em página SSG (sem isso o build falha:
+"useSearchParams() should be wrapped in a suspense boundary").
+
+Detalhe completo do estado pré-M1 em
+`../reactjs/improvements/v1/devfinder-next/devfinder-next-app-router-migration.md` e da migração
+M1 em si em `../reactjs/improvements/v3/devfinder-next/2-debito-arquitetural.md` — esta reversão
+volta pro modelo daquele primeiro documento (SSR só pra dado público, CSR pra dado de sessão),
+não pro código literal de antes (o padrão `UndoableUserCard`, Client Component-folha que se
+autoesconde no undo em vez de `useUndoList` refazendo a lista inteira, foi mantido — é
+independente da decisão SSR vs. CSR e é estritamente melhor).
 
 ### Estilização
 
@@ -123,24 +152,31 @@ a CSS estática, resolvida no cliente antes de qualquer pintura.
 
 ### Dados externos
 
-O backend REST em `NEXT_PUBLIC_API_URL` fornece os dados de vídeos, canais e usuários. Listagens
-usam `fetch` com `next: { revalidate: 60 * 60 * 8 }` (ISR); detalhe usa `fetch` com
-`cache: 'no-store'` (renderizado por request).
+O backend REST em `NEXT_PUBLIC_API_URL` fornece os dados de vídeos, canais e usuários. As 4
+listagens (`/`, `/video`, `/user`, `/channel`) buscam só a página 1 com `fetch` e
+`next: { revalidate: 60 * 60 * 8 }` (ISR) — sem `searchParams`/`cookies()`, então ○ Static de
+verdade (ver "Regra de renderização" acima). Detalhe usa `fetch` com `cache: 'no-store'`
+(renderizado por request).
 
-Trade-off aceito (M1): as 3 seções de sessão (`Subs` em `/` e `/video`, `UserLiked`/`UserDisliked`
-em `/user`) são buscadas a cada carga logada da rota correspondente, independente de qual aba
-está ativa — o Radix Tabs só evita re-render client-side da aba inativa, não o fetch
-server-side que já resolveu o Server Component passado como prop. Decisão consciente (sem custo
-de transformação de imagem associado, só requests de dado), não um bug — ver PR #7.
+As 4 listagens usam o mesmo timeout estendido (`LISTING_COLD_START_TIMEOUT_MS`, 55s,
+`lib/fetchListing.ts`) em vez do `DEFAULT_FETCH_TIMEOUT_MS` (5s, ainda usado pelas 3 páginas de
+detalhe) — cold start do Render free tier é reportado em ~30-60s, bem acima dos 5s originais.
+Acompanhado de `export const maxDuration = 60` nas 4 `page.tsx`: sem isso a Vercel mataria a
+função bem antes dos 55s (10s é o default do Hobby sem Fluid Compute); o timeout interno fica
+abaixo do `maxDuration` de propósito, pra sempre ganhar a corrida contra o kill da plataforma e
+devolver o fallback amigável em vez de um 504 cru dela. Não elimina o cold start (limitação de
+terceiro, ver `docs/limitacoes-conhecidas.md`), só reduz bem a chance de um visitante esbarrar
+nele. As 4 também fazem `.catch()` no call site do próprio `page.tsx` (não dentro de
+`fetchListing`, que continua relançando por padrão — `review-human.md` #1) pra renderizar
+`<FeedbackMessage message={LISTING_UNAVAILABLE_MESSAGE} />` só quando ainda não existe nenhuma
+versão boa em cache pra proteger (1ª geração da rota, logo após um deploy) — uma revalidação de
+fundo que falha continua preservando a última versão boa (comportamento nativo do Next), o
+`.catch()` só cobre o caso sem nada bom ainda pra mostrar. Reproduzido em produção em
+2026-09-22 (cold start do Render coincidindo com um deploy novo).
 
-Mesmo trade-off se estende ao timeout de listagem (A4, v4 Etapa 2): a seção de sessão roda no
-mesmo `Promise.all` da listagem pública, então toda vez que a listagem falha o fetch/render da
-seção de sessão já foi disparado em paralelo e é descartado — desde `review-human.md` #1,
-`fetchListing` relança o erro em vez de devolver `null`, e a página inteira (session incluída)
-aborta via exceção pro `error.tsx` global, em vez do antigo `if (!trend) return
-<FeedbackMessage />`; o desperdício descrito aqui é o mesmo, só muda o mecanismo de descarte. Ir
-sequencial (só buscar sessão depois de confirmar a listagem) eliminaria esse desperdício, mas
-custaria uma rodada extra de latência no caminho comum (listagem OK, que é a maioria dos casos)
-pra economizar uma request rara (backend fora do ar). Mantido paralelo por ser o trade-off menos
-custoso no caso comum — sinalizado aqui pra não ser achado de novo como se fosse regressão não
-intencional (achado do fechamento v4).
+O antigo trade-off da seção de sessão (`Subs`/`UserLiked`/`UserDisliked` buscadas a cada carga
+logada, mesmo com a aba fechada — PR #7) e o trade-off do timeout de listagem que se estendia a
+ela (A4, v4 Etapa 2, Promise.all descartando o fetch de sessão quando a listagem falhava) não
+existem mais desde a reversão de M1: sessão virou CSR, só monta (e só busca) dentro da própria
+aba, e não compartilha `Promise.all` nenhum com a listagem pública — ver "Regra de renderização"
+acima. Não precisa ser vigiado de novo como regressão.

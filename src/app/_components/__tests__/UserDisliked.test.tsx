@@ -1,47 +1,56 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 
 import UserDisliked from '../UserDisliked'
-import { fetchSessionJSON, redirectIfSessionExpired } from '../../../lib/fetchSessionJSON'
-import { SESSION_FETCH_TIMEOUT_MS } from '../sessionFetch'
+import api from '../../../services/api'
+import { useAuth } from '../../../hooks/auth'
 
-jest.mock('../../../lib/fetchSessionJSON', () => ({
-  fetchSessionJSON: jest.fn(),
-  redirectIfSessionExpired: jest.fn(),
-}))
 jest.mock('../../../services/api', () => ({
   __esModule: true,
-  default: { delete: jest.fn() },
+  default: { get: jest.fn(), delete: jest.fn() },
+}))
+jest.mock('../../../hooks/auth', () => ({
+  useAuth: jest.fn(),
+  isLoggedIn: (user: { _id?: string }) => Boolean(user?._id),
 }))
 
-const mockedFetchSessionJSON = fetchSessionJSON as jest.Mock
-const mockedRedirectIfSessionExpired = redirectIfSessionExpired as jest.Mock
+const mockedApiGet = api.get as jest.Mock
+const mockedUseAuth = useAuth as jest.Mock
 
-describe('UserDisliked (Server Component)', () => {
+describe('UserDisliked (Client Component, CSR)', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('busca /dislikes/devs com o token e renderiza a lista', async () => {
-    mockedFetchSessionJSON.mockResolvedValueOnce([
-      { _id: 'u1', user: 'devuser', name: 'Dev User', avatar: 'https://avatars.githubusercontent.com/u/1' },
-    ])
+  it('não busca nada antes da sessão hidratar logada', () => {
+    mockedUseAuth.mockReturnValue({ user: {}, isHydrated: false })
 
-    const jsx = await UserDisliked({ token: 'abc123' })
-    render(jsx)
+    render(<UserDisliked />)
 
-    expect(mockedFetchSessionJSON).toHaveBeenCalledWith('/dislikes/devs', 'abc123', SESSION_FETCH_TIMEOUT_MS)
-    expect(screen.getByText('Dev User')).toBeInTheDocument()
+    expect(mockedApiGet).not.toHaveBeenCalled()
+  })
+
+  it('busca /dislikes/devs assim que a sessão hidrata logada, e renderiza a lista', async () => {
+    mockedUseAuth.mockReturnValue({ user: { _id: 'u1' }, isHydrated: true })
+    mockedApiGet.mockResolvedValueOnce({
+      data: [{ _id: 'u1', user: 'devuser', name: 'Dev User', avatar: 'https://avatars.githubusercontent.com/u/1' }],
+    })
+
+    render(<UserDisliked />)
+
+    await waitFor(() => expect(screen.getByText('Dev User')).toBeInTheDocument())
+
+    expect(mockedApiGet).toHaveBeenCalledWith('/dislikes/devs')
     expect(screen.getByText('Desmarcar')).toBeInTheDocument()
   })
 
   it('renderiza mensagem de erro inline quando o fetch falha, sem lançar', async () => {
-    const error = new Error('network error')
-    mockedFetchSessionJSON.mockRejectedValueOnce(error)
+    mockedUseAuth.mockReturnValue({ user: { _id: 'u1' }, isHydrated: true })
+    mockedApiGet.mockRejectedValueOnce(new Error('network error'))
 
-    const jsx = await UserDisliked({ token: 'abc123' })
-    render(jsx)
+    render(<UserDisliked />)
 
-    expect(mockedRedirectIfSessionExpired).toHaveBeenCalledWith(error)
-    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar sua lista de não seguidos agora.')
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível carregar sua lista de não seguidos agora.')
+    })
   })
 })

@@ -4,16 +4,24 @@ import React, { ReactNode } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 
 import ContainerFullWidth from '../video/style';
+import { useAuth, isLoggedIn } from '../../hooks/auth';
 import { TAB_TRIGGER_CLASSNAME } from './tabTriggerClassName';
+import Subs from './Subs';
 
 interface HomeFeedProps {
   children: ReactNode;
-  isLoggedIn: boolean;
-  subs?: ReactNode;
 }
 
-// Ver comentário equivalente em UserTabs.tsx.
-export default function HomeFeed({ children, isLoggedIn, subs }: HomeFeedProps) {
+// Decide a visibilidade da aba "Inscrições" via `useAuth()`/`isHydrated` de novo (reversão
+// consciente de M1, etapa 2 v3 — ver comentário equivalente em UserTabs.tsx): a aba pública
+// "Explorar" não depende disso, só é renderizada incondicionalmente abaixo, então não volta o
+// achado 4 daquela etapa (página inteira esperando hidratação). O único custo aceito é a aba
+// "Inscrições" aparecer um instante depois do primeiro paint pra quem está logado, em vez de já
+// vir pronta no HTML.
+export default function HomeFeed({ children }: HomeFeedProps) {
+  const { user, isHydrated } = useAuth();
+  const showSubsTab = isHydrated && isLoggedIn(user);
+
   return (
     <ContainerFullWidth className="container-full-width" loading={false}>
       <Tabs.Root defaultValue="explore">
@@ -27,7 +35,7 @@ export default function HomeFeed({ children, isLoggedIn, subs }: HomeFeedProps) 
           >
             Explorar
           </Tabs.Trigger>
-          {isLoggedIn &&
+          {showSubsTab &&
             <Tabs.Trigger
               className={TAB_TRIGGER_CLASSNAME}
               value="subs"
@@ -40,9 +48,9 @@ export default function HomeFeed({ children, isLoggedIn, subs }: HomeFeedProps) 
         <Tabs.Content value="explore">
           {children}
         </Tabs.Content>
-        {isLoggedIn &&
+        {showSubsTab &&
           <Tabs.Content value="subs">
-            {subs}
+            <Subs />
           </Tabs.Content>
         }
       </Tabs.Root>
