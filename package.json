@@ -17,7 +17,7 @@
     "@radix-ui/react-tabs": "^1.1.21",
     "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.7.0",
-    "next": "^15.5.14",
+    "next": "^15.5.28",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-icons": "^4.4.0",
@@ -36,7 +36,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.0.0",
-    "eslint-config-next": "^15.5.14",
+    "eslint-config-next": "^15.5.28",
     "eslint-plugin-react-hooks": "^5.2.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
@@ -47,6 +47,11 @@
     "onlyBuiltDependencies": [
       "sharp",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "postcss": "^8.5.23",
+      "source-map-js": "^1.2.2",
+      "follow-redirects": "^1.16.1"
+    }
   }
 }
