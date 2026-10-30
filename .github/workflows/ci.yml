@@ -23,13 +23,24 @@ jobs:
       - run: pnpm exec tsc --noEmit
       - run: pnpm lint
       - run: pnpm test
+      # Build contra porta fechada de propósito: as 4 listagens têm `.catch()` no call site e caem
+      # no fallback (`LISTING_UNAVAILABLE_MESSAGE`) em vez de quebrar o build, então o `next build`
+      # passa sem backend e o CI não depende do deploy gratuito do Render (sem SLA, cold start de
+      # 30-60s — ver docs/limitacoes-conhecidas.md). Pega o que só aparecia no deploy da Vercel:
+      # rota dinâmica sem Suspense, import quebrado, erro de config. Limite: só o caminho de
+      # fallback das listagens é pré-renderizado, então uma regressão no formato da resposta do
+      # backend (`docs`/`total`/`itemsPerPage`) não aparece aqui — isso é coberto por teste.
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:1/v1
 
-# "pnpm build" fica fora do gate de PR de propósito: as páginas de listagem ("/", "/user",
-# "/channel", "/video") são Server Components que buscam com `fetch(..., { next: { revalidate }
-# })` direto em NEXT_PUBLIC_API_URL (App Router, não mais getStaticProps do Pages Router) — o
-# `next build` ainda executa esse fetch em build-time por causa do ISR, então só passa com um
-# backend real e acessível no ar (verificado localmente com devfinder-api rodando). O único
-# backend público hoje é o deploy de referência em onrender.com — plano gratuito, sem SLA,
-# sujeito a cold start; nada garante que responda a tempo durante o build de um CI de terceiros.
-# Gatear o PR nisso tornaria o CI refém da disponibilidade de um serviço externo fora do
-# controle deste repositório.
+  # Job separado: um advisory novo pode ser publicado a qualquer hora e derrubaria um PR sem
+  # relação com o diff — assim aparece como check próprio, sem mascarar tsc/lint/test/build.
+  # Limiar `high`: critical e high falham; moderate/low não.
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      # `pnpm audit` só lê o lockfile — sem setup-node/cache/install.
+      - run: pnpm audit --prod --audit-level=high
