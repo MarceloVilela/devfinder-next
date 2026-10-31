@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE, LISTING_COLD_START_TIMEOUT_MS } from '../lib/fetchListing';
+import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../lib/fetchListing';
+import { COLD_START_TIMEOUT_MS } from '../lib/fetchJSON';
 import { VideoData } from '../types';
 import { FeedbackMessage } from '../components';
 import HomeFeed from './_components/HomeFeed';
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   title: `Home | ${process.env.NEXT_PUBLIC_TITLE ?? 'DevFinder'}`,
 };
 
-// Acompanha LISTING_COLD_START_TIMEOUT_MS (lib/fetchListing.ts) — sem isso a própria Vercel mata
+// Acompanha COLD_START_TIMEOUT_MS (lib/fetchJSON.ts) — sem isso a própria Vercel mata
 // a função bem antes dos 55s do nosso timeout (10s default no Hobby sem Fluid Compute); 60s é o
 // teto do Hobby legado, por isso o nosso timeout interno fica um pouco abaixo pra sempre ganhar
 // a corrida e devolver o fallback amigável em vez de um 504 cru da plataforma.
@@ -31,7 +32,7 @@ export default async function HomePage() {
   // lib/fetchListing.ts.
   const trend = await fetchListing<ListingFeed<VideoData>>('/feed/trending?page=1', {
     next: { revalidate: 60 * 60 * 8 },
-    timeoutMs: LISTING_COLD_START_TIMEOUT_MS,
+    timeoutMs: COLD_START_TIMEOUT_MS,
   }).catch(() => null);
 
   if (!trend) {

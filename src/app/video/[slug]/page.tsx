@@ -9,6 +9,10 @@ import { DETAIL_ACTION_BUTTON_CLASSNAME } from '../../../lib/detailActionButtonC
 import { Container } from '../../../components';
 import { VideoData } from '../../../types';
 
+// Acompanha COLD_START_TIMEOUT_MS (lib/fetchJSON.ts, usado por `fetchDetail`): este valor precisa
+// ficar acima dele — o Next exige literal aqui, então não dá pra importar; ver comentário na constante.
+export const maxDuration = 60;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }

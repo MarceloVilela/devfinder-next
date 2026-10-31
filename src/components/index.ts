@@ -1,5 +1,6 @@
 import ChannelItem from './ChannelItem'
 import Container from './Container'
+import DetailSkeleton from './DetailSkeleton'
 import FeedbackMessage from './FeedbackMessage'
 import Footer from './Footer'
 import Header from './Header'
@@ -10,6 +11,7 @@ import VideoThumbItem from './VideoThumbItem'
 export {
   ChannelItem,
   Container,
+  DetailSkeleton,
   FeedbackMessage,
   Footer,
   Header,

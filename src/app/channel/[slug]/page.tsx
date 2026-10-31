@@ -5,11 +5,16 @@ import { FaYoutube, FaGithub } from 'react-icons/fa';
 
 import { fetchDetail } from '../../../lib/fetchDetail';
 import { fetchListing, ListingFeed } from '../../../lib/fetchListing';
+import { DEFAULT_FETCH_TIMEOUT_MS } from '../../../lib/fetchJSON';
 import { Container } from '../../../components';
 import { ChannelData, VideoData } from '../../../types';
 import './style.css';
 import ChannelLikeButtons from '../../_components/ChannelLikeButtons';
 import ChannelVideoFeed from '../../_components/ChannelVideoFeed';
+
+// Acompanha COLD_START_TIMEOUT_MS (lib/fetchJSON.ts, usado por `fetchDetail`): este valor precisa
+// ficar acima dele — o Next exige literal aqui, então não dá pra importar; ver comentário na constante.
+export const maxDuration = 60;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -28,11 +33,22 @@ async function getChannel(searchQuery: string): Promise<ChannelData | null> {
 // ISR pra proteger aqui (rota já é dinâmica por causa do `cache: 'no-store'` de `getChannel`),
 // então não se aplica o motivo que fez as 4 listagens públicas manterem fallback local antes
 // desta correção (review-human.md #1).
-async function getChannelFeed(channelName: string, page: number): Promise<ListingFeed<VideoData>> {
+async function getChannelFeed(
+  channelName: string,
+  page: number,
+  timeoutMs: number,
+): Promise<ListingFeed<VideoData>> {
   return fetchListing<ListingFeed<VideoData>>(
     `/feed/channel?channel_name=${encodeURIComponent(channelName)}&page=${page}`,
+    { timeoutMs },
   );
 }
+
+// `getChannel` (cold start, até COLD_START_TIMEOUT_MS) e o feed rodam em sequência dentro dos 60s de
+// `maxDuration`: o feed só ganha o timeout curto de sempre se sobrar orçamento — senão uma
+// `getChannel` lenta (~54s) somada aos 5s do feed passaria dos 60s e a plataforma mataria a função
+// (504 cru em vez do `error.tsx`).
+const FUNCTION_BUDGET_MS = 58_000;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -50,13 +66,15 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
 
+  const startedAt = Date.now();
   const channel = await getChannel(slug);
 
   if (!channel) {
     notFound();
   }
 
-  const feed = await getChannelFeed(channel.name, currentPage);
+  const feedTimeoutMs = Math.min(DEFAULT_FETCH_TIMEOUT_MS, FUNCTION_BUDGET_MS - (Date.now() - startedAt));
+  const feed = await getChannelFeed(channel.name, currentPage, feedTimeoutMs);
 
   const { docs, total, itemsPerPage } = feed;
 
