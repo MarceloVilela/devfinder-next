@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, LISTING_UNAVAILABLE_MESSAGE, LISTING_COLD_START_TIMEOUT_MS } from '../../lib/fetchListing';
+import { fetchListing, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { COLD_START_TIMEOUT_MS } from '../../lib/fetchJSON';
 import { ChannelData } from '../../types';
 import { FeedbackMessage } from '../../components';
 import ChannelCategories from '../_components/ChannelCategories';
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   title: 'Canais',
 };
 
-// Ver comentário em app/page.tsx (acompanha LISTING_COLD_START_TIMEOUT_MS).
+// Ver comentário em app/page.tsx (acompanha COLD_START_TIMEOUT_MS).
 export const maxDuration = 60;
 
 export default async function ChannelListPage() {
@@ -17,7 +18,7 @@ export default async function ChannelListPage() {
   // em lib/fetchListing.ts e em app/page.tsx.
   const channels = await fetchListing<ChannelData[]>('/channels', {
     next: { revalidate: 60 * 60 * 8 },
-    timeoutMs: LISTING_COLD_START_TIMEOUT_MS,
+    timeoutMs: COLD_START_TIMEOUT_MS,
   }).catch(() => null);
 
   if (!channels) {

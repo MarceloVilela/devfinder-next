@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE, LISTING_COLD_START_TIMEOUT_MS } from '../../lib/fetchListing';
+import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { COLD_START_TIMEOUT_MS } from '../../lib/fetchJSON';
 import { VideoData } from '../../types';
 import { FeedbackMessage } from '../../components';
 import HomeFeed from '../_components/HomeFeed';
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Vídeos',
 };
 
-// Ver comentário em app/page.tsx (acompanha LISTING_COLD_START_TIMEOUT_MS).
+// Ver comentário em app/page.tsx (acompanha COLD_START_TIMEOUT_MS).
 export const maxDuration = 60;
 
 // Sem `searchParams` nem `cookies()` — ver comentário em app/page.tsx (mesma reversão de M1,
@@ -18,7 +19,7 @@ export const maxDuration = 60;
 export default async function VideoListPage() {
   const trend = await fetchListing<ListingFeed<VideoData>>('/feed/trending?page=1', {
     next: { revalidate: 60 * 60 * 8 },
-    timeoutMs: LISTING_COLD_START_TIMEOUT_MS,
+    timeoutMs: COLD_START_TIMEOUT_MS,
   }).catch(() => null);
 
   if (!trend) {

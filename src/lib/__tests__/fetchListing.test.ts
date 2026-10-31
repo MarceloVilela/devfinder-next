@@ -1,5 +1,5 @@
-import { fetchListing, LISTING_COLD_START_TIMEOUT_MS } from '../fetchListing';
-import { DEFAULT_FETCH_TIMEOUT_MS } from '../fetchJSON';
+import { fetchListing } from '../fetchListing';
+import { COLD_START_TIMEOUT_MS, DEFAULT_FETCH_TIMEOUT_MS } from '../fetchJSON';
 
 describe('fetchListing', () => {
   const originalFetch = global.fetch;
@@ -38,13 +38,13 @@ describe('fetchListing', () => {
     timeoutSpy.mockRestore();
   });
 
-  it('repassa um timeoutMs customizado pra fetchJSON (ex. LISTING_COLD_START_TIMEOUT_MS de `/`, `/user`, `/channel`)', async () => {
+  it('repassa um timeoutMs customizado pra fetchJSON (ex. COLD_START_TIMEOUT_MS das listagens)', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ docs: [] }) }) as unknown as typeof fetch;
     const timeoutSpy = jest.spyOn(AbortSignal, 'timeout');
 
-    await fetchListing('/channels', { timeoutMs: LISTING_COLD_START_TIMEOUT_MS });
+    await fetchListing('/channels', { timeoutMs: COLD_START_TIMEOUT_MS });
 
-    expect(timeoutSpy).toHaveBeenCalledWith(LISTING_COLD_START_TIMEOUT_MS);
+    expect(timeoutSpy).toHaveBeenCalledWith(COLD_START_TIMEOUT_MS);
     timeoutSpy.mockRestore();
   });
 });

@@ -19,15 +19,24 @@ pnpm dev      # servidor de desenvolvimento em http://localhost:3000
 pnpm build    # build de produção
 pnpm start    # servidor de produção (requer build anterior)
 pnpm lint     # ESLint CLI direto, eslint . --max-warnings=0 (sem o wrapper depreciado do next lint)
+pnpm test     # Jest + Testing Library (gate do CI)
+pnpm exec tsc --noEmit   # checagem de tipos (gate do CI; não há script `tsc` no package.json)
 ```
 
 ## Variáveis de ambiente
 
-Copie `.env.example` para `.env.local` e preencha os valores:
+Copie `.env.example` para `.env.local` e preencha os valores. Só a primeira é obrigatória: com um
+`.env.local` contendo apenas `NEXT_PUBLIC_API_URL`, o app sobe e as rotas públicas respondem 200
+(verificado em 2026-10-30). Variáveis `NEXT_PUBLIC_*` são embutidas no build — mudar uma exige
+novo build.
 
-```
-NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
-```
+| Variável | Uso | Necessidade |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | backend REST (`fetchJSON`, axios, rewrite `/backend`, login) | **obrigatória** (ex.: `http://localhost:3333/v1` ou o deploy do Render) |
+| `NEXT_PUBLIC_TITLE` | título do site | recomendada: sem ela os metadados caem em `'DevFinder'`, mas o `<h1>` do logo (Header e login) fica vazio |
+| `VIDEO_REFRESH_TOKEN` | gate de `/video/refresh` (`?token=`) | opcional: sem ela a rota dá 404 para todos |
+| `NEXT_PUBLIC_API_AUTO`, `NEXT_PUBLIC_JSONBIN_ID_CHANNEL` | só o dashboard de `/video/refresh` (`RefreshClient`) | opcionais |
+| `JSONBIN_KEY_MASTER`, `JSONBIN_ID_SUBS` | só a rota `pages/api/jsonbin` | opcionais: sem elas a rota responde 500 com mensagem explícita |
 
 ## Arquitetura
 
@@ -60,10 +69,10 @@ NEXT_PUBLIC_API_URL=http://localhost:3333/v1   # API backend externa
 - `pages/api/` — Route Handler legado (Pages API route: `jsonbin`) — mantido fora do App Router
   porque só lê segredo de servidor puro (master key do JSONBin) sem estado de sessão do usuário,
   sem necessidade real de virar Route Handler do App Router; coexiste com `app/` sem conflito
-- `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate); exportados via `components/index.ts`. Header/Footer/Paginate são `'use client'` (hooks/estado)
+- `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate); `DetailSkeleton` (esqueleto dos `loading.tsx` de detalhe); exportados via `components/index.ts`. Header/Footer/Paginate são `'use client'` (hooks/estado)
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
 - `lib/fetchJSON.ts` — helper tipado de `fetch` para uso em Server Component, com timeout opcional
-  (`timeoutMs`) via `DEFAULT_FETCH_TIMEOUT_MS`; `lib/fetchListing.ts` encapsula o padrão das 4
+  (`timeoutMs`) via `DEFAULT_FETCH_TIMEOUT_MS` (5s) ou `COLD_START_TIMEOUT_MS` (55s, declarada aqui); `lib/fetchListing.ts` encapsula o padrão das 4
   listagens públicas (timeout + log da falha + override de `timeoutMs` por chamador — ver
   "Dados externos" abaixo pra timeout/fallback/`maxDuration`, iguais nas 4 desde a reversão de
   M1); `lib/fetchDetail.ts` encapsula o das
@@ -156,13 +165,17 @@ O backend REST em `NEXT_PUBLIC_API_URL` fornece os dados de vídeos, canais e us
 listagens (`/`, `/video`, `/user`, `/channel`) buscam só a página 1 com `fetch` e
 `next: { revalidate: 60 * 60 * 8 }` (ISR) — sem `searchParams`/`cookies()`, então ○ Static de
 verdade (ver "Regra de renderização" acima). Detalhe usa `fetch` com `cache: 'no-store'`
-(renderizado por request).
+(renderizado por request), com `loading.tsx` por segmento (`DetailSkeleton`) pra dar feedback
+enquanto o backend acorda (streaming: ver trade-off do status 200 em
+`docs/limitacoes-conhecidas.md`).
 
-As 4 listagens usam o mesmo timeout estendido (`LISTING_COLD_START_TIMEOUT_MS`, 55s,
-`lib/fetchListing.ts`) em vez do `DEFAULT_FETCH_TIMEOUT_MS` (5s, ainda usado pelas 3 páginas de
-detalhe) — cold start do Render free tier é reportado em ~30-60s, bem acima dos 5s originais.
-Acompanhado de `export const maxDuration = 60` nas 4 `page.tsx`: sem isso a Vercel mataria a
-função bem antes dos 55s (10s é o default do Hobby sem Fluid Compute); o timeout interno fica
+As 4 listagens e as 3 páginas de detalhe usam o mesmo timeout estendido (`COLD_START_TIMEOUT_MS`,
+55s, `lib/fetchJSON.ts`) em vez do `DEFAULT_FETCH_TIMEOUT_MS` (5s, só o default de `fetchListing`
+quando o chamador não passa `timeoutMs`; o feed de vídeos do canal, que roda depois de
+`getChannel` já ter acordado o backend, usa `min(5s, orçamento restante de 58s)` pra não passar
+do `maxDuration`) — cold start do Render free tier é reportado em ~30-60s,
+bem acima dos 5s originais. Acompanhado de `export const maxDuration = 60` nas 7 `page.tsx`: sem
+isso a Vercel mataria a função bem antes dos 55s (10s é o default do Hobby sem Fluid Compute); o timeout interno fica
 abaixo do `maxDuration` de propósito, pra sempre ganhar a corrida contra o kill da plataforma e
 devolver o fallback amigável em vez de um 504 cru dela. Não elimina o cold start (limitação de
 terceiro, ver `docs/limitacoes-conhecidas.md`), só reduz bem a chance de um visitante esbarrar
