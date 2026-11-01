@@ -23,6 +23,11 @@ pnpm test     # Jest + Testing Library (gate do CI)
 pnpm exec tsc --noEmit   # checagem de tipos (gate do CI; não há script `tsc` no package.json)
 ```
 
+**Dependências:** o Dependabot está desligado de propósito (`docs/decisions/0004-dependabot-desligado.md`).
+Não recriar `.github/dependabot.yml`. A segurança é coberta pelo job `audit` do CI (bloqueia
+`high`/`critical`); a defasagem, por `pnpm outdated` no fechamento de cada rodada de melhorias.
+Majors da stack central entram só como item planejado, nunca como bump isolado.
+
 ## Variáveis de ambiente
 
 Copie `.env.example` para `.env.local` e preencha os valores. Só a primeira é obrigatória: com um
