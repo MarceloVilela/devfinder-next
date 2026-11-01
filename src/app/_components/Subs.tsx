@@ -5,16 +5,10 @@ import React, { Suspense, useEffect, useState } from 'react'
 import api from '../../services/api'
 import { useAuth, isLoggedIn } from '../../hooks/auth';
 import { Paginate, VideoThumbItem, Container } from '../../components'
-import { VideoData } from '../../types'
+import { ListingFeed, VideoData } from '../../types'
 import { VideoList } from '../video/style'
 import { makePlaceholders } from '../../utils'
 import { SessionErrorFallback } from './SessionErrorFallback';
-
-interface SubsFeed {
-  docs: VideoData[];
-  total: number;
-  itemsPerPage: number;
-}
 
 // Client Component (voltou a ser CSR — reversão consciente de M1/etapa 2 v3): sessão vive num
 // cookie httpOnly, então o axios (`services/api.ts`, withCredentials) já manda o cookie sozinho
@@ -45,7 +39,7 @@ export default function Subs() {
         setError(false);
         setDocs(makePlaceholders<VideoData>(itemsPerPage || 30));
 
-        const { data } = await api.get<SubsFeed>('/feed/subscriptions', { params: { page } });
+        const { data } = await api.get<ListingFeed<VideoData>>('/feed/subscriptions', { params: { page } });
 
         if (cancelled) return;
 
@@ -72,7 +66,7 @@ export default function Subs() {
   }
 
   return (
-    <Container loading={false} unstylized className='container-full-width'>
+    <Container unstylized className='container-full-width'>
       <VideoList className="subs list-flex-column">
         {docs.map((item, index) => (
           <VideoThumbItem key={item._id || index} video={item} placeholder={loading} />

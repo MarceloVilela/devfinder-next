@@ -27,7 +27,7 @@ export default function UserTabs({ children }: UserTabsProps) {
   const showSessionTabs = isHydrated && isLoggedIn(user);
 
   return (
-    <Container loading={false}>
+    <Container>
       <Tabs.Root defaultValue="start">
         <Tabs.List className="flex border-0 list-none">
           <Tabs.Trigger

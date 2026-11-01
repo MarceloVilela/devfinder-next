@@ -6,13 +6,12 @@ import './style.css';
 
 interface ContainerFullWidthProps {
   children: ReactNode;
-  loading: boolean;
   className?: string;
 }
 
-const ContainerFullWidth: React.FC<ContainerFullWidthProps> = ({ children, loading, className }) => {
+const ContainerFullWidth: React.FC<ContainerFullWidthProps> = ({ children, className }) => {
   return (
-    <Container loading={loading} className={classNames('video-list-shell', className)}>
+    <Container className={classNames('video-list-shell', className)}>
       {children}
     </Container>
   );

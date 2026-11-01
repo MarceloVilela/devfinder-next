@@ -11,7 +11,7 @@ interface SessionErrorFallbackProps {
 // este fallback cobre qualquer outra falha (rede, timeout, 5xx).
 export function SessionErrorFallback({ message }: SessionErrorFallbackProps) {
   return (
-    <Container loading={false} unstylized className="container-full-width">
+    <Container unstylized className="container-full-width">
       <p role="alert">{message}</p>
     </Container>
   );

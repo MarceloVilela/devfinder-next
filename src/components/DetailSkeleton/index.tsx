@@ -38,7 +38,7 @@ const DetailSkeleton: React.FC<DetailSkeletonProps> = ({ shape }) => {
     );
 
   return (
-    <Container loading={false} className="containerVerticalCenter">
+    <Container className="containerVerticalCenter">
       <div role="status" aria-busy="true" className="w-full">
         <span className="sr-only">Carregando…</span>
         {content}

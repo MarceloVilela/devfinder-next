@@ -12,6 +12,7 @@ interface ChannelLikeButtonsProps {
 
 export default function ChannelLikeButtons({ channelId, channelName }: ChannelLikeButtonsProps) {
   const {
+    containerRef,
     pending,
     includedInLike,
     includedInDislike,
@@ -29,13 +30,14 @@ export default function ChannelLikeButtons({ channelId, channelName }: ChannelLi
   });
 
   return (
-    <div className='buttons'>
+    <div ref={containerRef} className='buttons'>
       {(!includedInDislike && !includedInLike) &&
         <>
           <button
             type='button'
             onClick={() => handleDislike()}
             disabled={pending}
+            data-kind='dislike'
             aria-label={`Marcar ${channelName} como não seguido`}
           >
             <MdSyncDisabled className="dislike" aria-hidden="true" />
@@ -45,6 +47,7 @@ export default function ChannelLikeButtons({ channelId, channelName }: ChannelLi
             type='button'
             onClick={() => handleLike()}
             disabled={pending}
+            data-kind='like'
             aria-label={`Favoritar ${channelName}`}
           >
             <MdStarBorder aria-hidden="true" />
@@ -53,13 +56,25 @@ export default function ChannelLikeButtons({ channelId, channelName }: ChannelLi
       }
 
       {includedInDislike &&
-        <button type='button' onClick={() => handleUndoDislike()} disabled={pending}>
+        <button
+          type='button'
+          onClick={() => handleUndoDislike()}
+          disabled={pending}
+          data-kind='dislike'
+          aria-label={`Desmarcar ${channelName} como não seguido`}
+        >
           <MdSyncDisabled className="dislike" aria-hidden="true" /><span>Desmarcar</span>
         </button>
       }
 
       {includedInLike &&
-        <button type='button' onClick={() => handleUndoLike()} disabled={pending}>
+        <button
+          type='button'
+          onClick={() => handleUndoLike()}
+          disabled={pending}
+          data-kind='like'
+          aria-label={`Desmarcar favorito ${channelName}`}
+        >
           <MdStarBorder aria-hidden="true" /><span>Desmarcar</span>
         </button>
       }

@@ -42,7 +42,7 @@ export default async function VideoDetail({ params }: PageProps) {
   }
 
   return (
-    <Container loading={false} className="containerVerticalCenter">
+    <Container className="containerVerticalCenter">
       <article className="flex flex-col w-full items-center mx-auto">
         <Image
           className="border-0 rounded-2xl w-[270px] h-auto mb-6"

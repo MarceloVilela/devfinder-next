@@ -2,14 +2,6 @@ import { DEFAULT_FETCH_TIMEOUT_MS, fetchJSON } from './fetchJSON';
 
 export const LISTING_UNAVAILABLE_MESSAGE = 'Não foi possível carregar. Tente novamente em instantes.';
 
-// Shape repetido em 3 interfaces quase idênticas (TrendingFeed/DevsFeed/ChannelFeed, achado do
-// fechamento v4) só por causa do tipo de item — uma única interface genérica em vez de 3 cópias.
-export interface ListingFeed<T> {
-  docs: T[];
-  total: number;
-  itemsPerPage: number;
-}
-
 // ATENÇÃO: sem `timeoutMs` o default é `DEFAULT_FETCH_TIMEOUT_MS` (5s), que estoura em todo cold
 // start do Render (~30-60s). Chamador cuja rota pode esbarrar num backend dormindo deve passar
 // `COLD_START_TIMEOUT_MS` (lib/fetchJSON.ts) junto de um `maxDuration` maior; só passe o default

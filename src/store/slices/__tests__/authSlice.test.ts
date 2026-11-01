@@ -1,4 +1,5 @@
-import reducer, { authActions, UserData } from '../authSlice'
+import reducer, { authActions } from '../authSlice'
+import type { UserData } from '../../../types'
 
 const user = { _id: '1', name: 'Octocat', user: 'octocat' } as UserData
 

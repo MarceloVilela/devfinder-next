@@ -3,8 +3,8 @@
 import React, { Suspense, useState } from 'react'
 import { toast } from 'react-toastify'
 
-import { UserData } from '../../hooks/auth'
-import { Container, UserItem, Paginate } from '../../components'
+import { ListingFeed, UserData } from '../../types'
+import { Container, UserItem, UserItemSkeleton, Paginate } from '../../components'
 import { makePlaceholders, getErrorMessage } from '../../utils'
 import api from '../../services/api'
 import UserLikeButtons from './UserLikeButtons'
@@ -13,12 +13,6 @@ export interface UserAllProps {
   docsStatic: UserData[];
   totalStatic: number;
   itemsPerPageStatic: number;
-}
-
-interface DevsFeed {
-  docs: UserData[];
-  total: number;
-  itemsPerPage: number;
 }
 
 // Client Component — ver comentário equivalente em Trend.tsx (mesma reversão: `page.tsx` busca
@@ -48,7 +42,7 @@ function UserAll({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) 
     setDocs(makePlaceholders<UserData>(itemsPerPage || 30));
 
     try {
-      const { data } = await api.get<DevsFeed>('/devs', { params: { page: goTo } });
+      const { data } = await api.get<ListingFeed<UserData>>('/devs', { params: { page: goTo } });
       setDocs(data.docs);
       setTotal(data.total);
       setItemsPerPage(data.itemsPerPage);
@@ -64,12 +58,16 @@ function UserAll({ docsStatic, totalStatic, itemsPerPageStatic }: UserAllProps) 
   };
 
   return (
-    <Container loading={false} unstylized className="container-full-width">
+    <Container unstylized className="container-full-width">
       <ul className="users list-flex-row list-none">
         {docs.map((user, index) => (
-          <UserItem key={user._id || index} user={user} placeholder={loading}>
-            {!loading && <UserLikeButtons userId={user._id} username={user.user} />}
-          </UserItem>
+          loading
+            ? <UserItemSkeleton key={index} />
+            : (
+              <UserItem key={user._id || index} user={user}>
+                <UserLikeButtons userId={user._id} username={user.user} />
+              </UserItem>
+            )
         ))}
       </ul>
       {/* Suspense obrigatório — ver comentário equivalente em Trend.tsx. */}

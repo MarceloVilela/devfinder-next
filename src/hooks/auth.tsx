@@ -3,10 +3,9 @@ import { useCallback } from 'react';
 import api from '../services/api';
 import { isServer } from '../utils';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { authActions, UserData } from '../store/slices/authSlice';
+import { authActions } from '../store/slices/authSlice';
+import type { UserData } from '../types';
 import type { AppDispatch } from '../store';
-
-export type { UserData };
 
 // Fonte única pra "usuário tem sessão" — `user` nunca é null/undefined (default `{}` no slice),
 // então checar presença de `_id` é o jeito correto de diferenciar visitante de logado.

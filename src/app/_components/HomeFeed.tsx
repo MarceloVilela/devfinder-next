@@ -23,7 +23,7 @@ export default function HomeFeed({ children }: HomeFeedProps) {
   const showSubsTab = isHydrated && isLoggedIn(user);
 
   return (
-    <ContainerFullWidth className="container-full-width" loading={false}>
+    <ContainerFullWidth className="container-full-width">
       <Tabs.Root defaultValue="explore">
         {/* `tab-list`: token exigido por app/video/style.css (`.video-list-shell .tab-list`,
            regra de padding mobile) — este é o único Tabs.List envolvido por `.video-list-shell`

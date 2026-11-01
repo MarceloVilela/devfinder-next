@@ -3,11 +3,11 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { FaGithub, FaHome } from 'react-icons/fa';
 
+import { UserData } from '../../../types';
 import { fetchDetail } from '../../../lib/fetchDetail';
 import { classNames } from '../../../lib/classNames';
 import { DETAIL_ACTION_BUTTON_CLASSNAME } from '../../../lib/detailActionButtonClassName';
 import { Container } from '../../../components';
-import { UserData } from '../../../hooks/auth';
 
 // Acompanha COLD_START_TIMEOUT_MS (lib/fetchJSON.ts, usado por `fetchDetail`): este valor precisa
 // ficar acima dele — o Next exige literal aqui, então não dá pra importar; ver comentário na constante.
@@ -42,7 +42,7 @@ export default async function UserDetail({ params }: PageProps) {
   }
 
   return (
-    <Container loading={false} className="containerVerticalCenter">
+    <Container className="containerVerticalCenter">
       <article className="flex flex-col w-[270px] items-center mx-auto">
         <Image
           className="border-0 rounded-full w-[270px] mb-6"

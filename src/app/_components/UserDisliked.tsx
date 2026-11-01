@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 
 import api from '../../services/api';
-import { useAuth, isLoggedIn, UserData } from '../../hooks/auth';
-import { Container, UserItem } from '../../components';
-import { makePlaceholders } from '../../utils';
+import { useAuth, isLoggedIn } from '../../hooks/auth';
+import { UserData } from '../../types';
+import { Container, UserItemSkeleton } from '../../components';
 import { UndoableUserCard } from './UndoableUserCard';
 import { SessionErrorFallback } from './SessionErrorFallback';
 
@@ -46,11 +46,11 @@ export default function UserDisliked() {
   }
 
   return (
-    <Container loading={false} unstylized className="container-full-width">
+    <Container unstylized className="container-full-width">
       <ul className="users list-flex-row list-none">
         {loading
-          ? makePlaceholders<UserData>(PLACEHOLDER_COUNT).map((user, index) => (
-            <UserItem key={index} user={user} placeholder />
+          ? Array.from({ length: PLACEHOLDER_COUNT }, (_, index) => (
+            <UserItemSkeleton key={index} />
           ))
           : docs.map((user) => (
             <UndoableUserCard

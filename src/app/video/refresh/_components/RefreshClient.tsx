@@ -132,7 +132,7 @@ export default function RefreshClient() {
   }
 
   return (
-    <Container loading={false}>
+    <Container>
       <main className="flex flex-col gap-4 py-4">
         <section className="flex gap-2 flex-wrap">
           <button
