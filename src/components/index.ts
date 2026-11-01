@@ -6,6 +6,7 @@ import Footer from './Footer'
 import Header from './Header'
 import Paginate from './Paginate'
 import UserItem from './UserItem'
+import UserItemSkeleton from './UserItemSkeleton'
 import VideoThumbItem from './VideoThumbItem'
 
 export {
@@ -17,5 +18,6 @@ export {
   Header,
   Paginate,
   UserItem,
+  UserItemSkeleton,
   VideoThumbItem
 }

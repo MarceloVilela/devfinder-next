@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { fetchListing, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
 import { COLD_START_TIMEOUT_MS } from '../../lib/fetchJSON';
-import { VideoData } from '../../types';
+import { ListingFeed, VideoData } from '../../types';
 import { FeedbackMessage } from '../../components';
 import HomeFeed from '../_components/HomeFeed';
 import Trend from '../_components/Trend';

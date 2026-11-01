@@ -1,18 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface UserData {
-  likes: string[];
-  deslikes: string[];
-  follow: string[];
-  ignore: string[];
-  _id: string;
-  name: string;
-  user: string;
-  bio?: string;
-  avatar: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { UserData } from '../../types';
 
 interface AuthState {
   user: UserData;

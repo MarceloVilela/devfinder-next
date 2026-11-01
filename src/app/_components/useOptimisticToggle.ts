@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import api from '../../services/api';
-import { useAuth, UserData } from '../../hooks/auth';
+import { useAuth } from '../../hooks/auth';
+import { UserData } from '../../types';
 
 type ListField = 'likes' | 'deslikes' | 'follow' | 'ignore';
 type Kind = 'like' | 'dislike';
@@ -60,6 +61,30 @@ export function useOptimisticToggle({
     return user[dislikedField].includes(entityId);
   }, [user, entityId, isHydrated, dislikedField]);
 
+  // Foco previsível depois da ação (a11y, achado M4 v5): o botão clicado é desmontado e substituído
+  // por outro conforme o estado muda, e o navegador devolve o foco ao `body` quando o elemento
+  // focado some — quem usa teclado perde o ponto em que estava. Depois que a request termina (com
+  // `pending` ainda true os botões estão `disabled` e não recebem foco), o foco vai pro botão do
+  // mesmo `kind` da ação (`data-kind` nos botões): "Desmarcar" depois de marcar, "Favoritar" depois
+  // de desmarcar favorito. Só age se o foco foi PERDIDO (`body`/`null`, ou o próprio contêiner) — se o
+  // usuário já tabulou pra outro elemento durante a request (cold start leva 30-60s), não rouba o foco.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const restoreFocusKind = useRef<Kind | null>(null);
+
+  useEffect(() => {
+    const kind = restoreFocusKind.current;
+    const container = containerRef.current;
+    if (pending || !kind || !container) {
+      return;
+    }
+    restoreFocusKind.current = null;
+    const active = document.activeElement;
+    const focusLost = !active || active === document.body || active === container;
+    if (focusLost) {
+      container.querySelector<HTMLButtonElement>(`button[data-kind="${kind}"]`)?.focus();
+    }
+  }, [pending, includedInLike, includedInDislike]);
+
   async function run(
     method: 'post' | 'delete',
     urlPrefix: 'likes' | 'dislikes',
@@ -73,6 +98,7 @@ export function useOptimisticToggle({
     }
 
     const previousUser = user;
+    restoreFocusKind.current = kind;
     const url = `/${urlPrefix}/${resource}/${resourceName}`;
     setPending(true);
     setUser(buildOptimisticUser(user));
@@ -122,6 +148,7 @@ export function useOptimisticToggle({
   );
 
   return {
+    containerRef,
     pending,
     includedInLike,
     includedInDislike,

@@ -12,6 +12,7 @@ interface UserLikeButtonsProps {
 
 export default function UserLikeButtons({ userId, username }: UserLikeButtonsProps) {
   const {
+    containerRef,
     pending,
     includedInLike,
     includedInDislike,
@@ -28,14 +29,19 @@ export default function UserLikeButtons({ userId, username }: UserLikeButtonsPro
     dislikedField: 'deslikes',
   });
 
+  const marked = includedInDislike || includedInLike;
+
+  // Um único contêiner (classe alternada) em vez de um `<div>` por estado: o `containerRef` do hook
+  // precisa sobreviver à troca de botões pra devolver o foco depois da ação.
   return (
-    <>
-      {(!includedInDislike && !includedInLike) &&
-        <div className='buttons'>
+    <div ref={containerRef} className={marked ? 'buttons single' : 'buttons'}>
+      {!marked &&
+        <>
           <button
             type='button'
             onClick={handleDislike}
             disabled={pending}
+            data-kind='dislike'
             aria-label={`Marcar ${username} como não seguido`}
           >
             <MdSyncDisabled className="dislike" aria-hidden="true" />
@@ -45,28 +51,37 @@ export default function UserLikeButtons({ userId, username }: UserLikeButtonsPro
             type='button'
             onClick={handleLike}
             disabled={pending}
+            data-kind='like'
             aria-label={`Favoritar ${username}`}
           >
             <MdStarBorder aria-hidden="true" />
           </button>
-        </div>
+        </>
       }
 
       {includedInDislike &&
-        <div className='buttons single'>
-          <button type='button' onClick={handleUndoDislike} disabled={pending}>
-            <MdSyncDisabled className="dislike" aria-hidden="true" />Desmarcar
-          </button>
-        </div>
+        <button
+          type='button'
+          onClick={handleUndoDislike}
+          disabled={pending}
+          data-kind='dislike'
+          aria-label={`Desmarcar ${username} como não seguido`}
+        >
+          <MdSyncDisabled className="dislike" aria-hidden="true" />Desmarcar
+        </button>
       }
 
       {includedInLike &&
-        <div className='buttons single'>
-          <button type='button' onClick={handleUndoLike} disabled={pending}>
-            <MdStarBorder aria-hidden="true" />Desmarcar
-          </button>
-        </div>
+        <button
+          type='button'
+          onClick={handleUndoLike}
+          disabled={pending}
+          data-kind='like'
+          aria-label={`Desmarcar favorito ${username}`}
+        >
+          <MdStarBorder aria-hidden="true" />Desmarcar
+        </button>
       }
-    </>
+    </div>
   );
 }

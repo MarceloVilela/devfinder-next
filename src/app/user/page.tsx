@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
-import { fetchListing, ListingFeed, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { fetchListing, LISTING_UNAVAILABLE_MESSAGE } from '../../lib/fetchListing';
+import { ListingFeed, UserData } from '../../types';
 import { COLD_START_TIMEOUT_MS } from '../../lib/fetchJSON';
-import { UserData } from '../../hooks/auth';
 import { FeedbackMessage } from '../../components';
 import UserTabs from '../_components/UserTabs';
 import UserAll from '../_components/UserAll';

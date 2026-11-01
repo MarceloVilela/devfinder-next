@@ -12,7 +12,7 @@ interface FeedbackMessageProps {
 // error.tsx (Client Component) tem `reset()`; o fallback local das listagens é Server Component.
 const FeedbackMessage: React.FC<FeedbackMessageProps> = ({ message, action }) => {
   return (
-    <Container loading={false} className="containerVerticalCenter">
+    <Container className="containerVerticalCenter">
       <p role="alert">{message}</p>
       {action}
     </Container>

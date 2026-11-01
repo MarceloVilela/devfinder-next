@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { FaYoutube, FaGithub } from 'react-icons/fa';
 
 import { fetchDetail } from '../../../lib/fetchDetail';
-import { fetchListing, ListingFeed } from '../../../lib/fetchListing';
+import { fetchListing } from '../../../lib/fetchListing';
 import { DEFAULT_FETCH_TIMEOUT_MS } from '../../../lib/fetchJSON';
 import { Container } from '../../../components';
-import { ChannelData, VideoData } from '../../../types';
+import { ChannelData, ListingFeed, VideoData } from '../../../types';
 import './style.css';
 import ChannelLikeButtons from '../../_components/ChannelLikeButtons';
 import ChannelVideoFeed from '../../_components/ChannelVideoFeed';
@@ -79,7 +79,7 @@ export default async function ChannelDetail({ params, searchParams }: PageProps)
   const { docs, total, itemsPerPage } = feed;
 
   return (
-    <Container loading={false} className="containerVerticalCenter">
+    <Container className="containerVerticalCenter">
       <ul className="channel-about bg-background-weakerer border border-background-weakerer rounded-[15px] mb-12">
         <li key={channel._id} className="flex flex-col p-4">
           <div className="avatar flex justify-center items-center">

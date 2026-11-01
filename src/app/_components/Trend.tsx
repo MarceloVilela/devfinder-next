@@ -4,7 +4,7 @@ import React, { Suspense, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { Paginate, VideoThumbItem, Container } from '../../components';
-import { VideoData } from '../../types';
+import { ListingFeed, VideoData } from '../../types';
 import { VideoList } from '../video/style';
 import { makePlaceholders, getErrorMessage } from '../../utils';
 import api from '../../services/api';
@@ -13,12 +13,6 @@ export interface TrendProps {
   docsStatic: VideoData[];
   totalStatic: number;
   itemsPerPageStatic: number;
-}
-
-interface TrendingFeed {
-  docs: VideoData[];
-  total: number;
-  itemsPerPage: number;
 }
 
 // Client Component (voltou a ser CSR além da página 1): ler `searchParams` no Server Component
@@ -53,7 +47,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
     setDocs(makePlaceholders<VideoData>(itemsPerPage || 30));
 
     try {
-      const { data } = await api.get<TrendingFeed>('/feed/trending', { params: { page: goTo } });
+      const { data } = await api.get<ListingFeed<VideoData>>('/feed/trending', { params: { page: goTo } });
       setDocs(data.docs);
       setTotal(data.total);
       setItemsPerPage(data.itemsPerPage);
@@ -69,7 +63,7 @@ const Trend = ({ docsStatic, totalStatic, itemsPerPageStatic }: TrendProps) => {
   };
 
   return (
-    <Container loading={false} unstylized className='container-full-width'>
+    <Container unstylized className='container-full-width'>
       <>
         <VideoList className="subs list-flex-column">
           {docs.map((item, index) => (

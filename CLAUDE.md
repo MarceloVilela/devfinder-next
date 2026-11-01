@@ -74,7 +74,7 @@ novo build.
 - `pages/api/` — Route Handler legado (Pages API route: `jsonbin`) — mantido fora do App Router
   porque só lê segredo de servidor puro (master key do JSONBin) sem estado de sessão do usuário,
   sem necessidade real de virar Route Handler do App Router; coexiste com `app/` sem conflito
-- `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate); `DetailSkeleton` (esqueleto dos `loading.tsx` de detalhe); exportados via `components/index.ts`. Header/Footer/Paginate são `'use client'` (hooks/estado)
+- `components/` — componentes compartilhados (Header, Footer, Container, VideoThumbItem, UserItem, ChannelItem, Paginate); `UserItemSkeleton` e `DetailSkeleton` (esqueletos de lista e dos `loading.tsx` de detalhe); exportados via `components/index.ts`. Header/Footer/Paginate são `'use client'` (hooks/estado)
 - `services/api.ts` — instância Axios client-only, usada pelos Client Components; Server Components usam `lib/fetchJSON.ts` (`fetch` nativo) em vez de axios
 - `lib/fetchJSON.ts` — helper tipado de `fetch` para uso em Server Component, com timeout opcional
   (`timeoutMs`) via `DEFAULT_FETCH_TIMEOUT_MS` (5s) ou `COLD_START_TIMEOUT_MS` (55s, declarada aqui); `lib/fetchListing.ts` encapsula o padrão das 4
@@ -85,7 +85,7 @@ novo build.
   `fetchJSON` porque passar `timeoutMs` anexa um `AbortSignal`, e isso faz o Next.js pular a
   deduplicação automática de fetch entre `generateMetadata` e a página (achado do fechamento v4);
   sem o `cache()`, cada page de detalhe dispararia 2 requests reais por carregamento
-- `types/` — tipos de domínio compartilhados (`VideoData`, `ChannelData`) usados tanto por Server quanto Client Components
+- `types/` — tipos de domínio compartilhados (`VideoData`, `ChannelData`, `UserData`, `ListingFeed<T>` — resposta paginada `{docs, total, itemsPerPage}`) usados tanto por Server quanto Client Components; importe sempre de `types/` (não há reexportação em `authSlice`/`hooks/auth`)
 - `hooks/` — `auth.tsx` (autenticação) e `styleSwitcher.tsx` (tema claro/escuro) — client-only, guardados por `isServer()`
 - `styles/css.d.ts` — declaração ambiente (`declare module '*.css'`) para imports de CSS como side-effect (`import './style.css'`) satisfazerem `tsc --noEmit`; o `next build`/`next dev` (webpack) já resolve isso nativamente, sem precisar da declaração
 - `_deprecated/` — código experimental untracked (transcrição/IA), fora do escopo do app; não referenciado por nenhuma rota

@@ -47,7 +47,7 @@ export default function ChannelCategories({ channelsStatic }: ChannelCategoriesP
   const activeCategory = categories[activeCategoryIndex] ?? categories[0];
 
   return (
-    <Container loading={false}>
+    <Container>
       <section>
         <select
           aria-label="Filtrar canais por categoria"

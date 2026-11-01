@@ -2,7 +2,8 @@ import { renderHook, act } from '@testing-library/react'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 
-import { useAuth, hydrateAuth, isLoggedIn, UserData } from '../auth'
+import { useAuth, hydrateAuth, isLoggedIn } from '../auth'
+import type { UserData } from '../../types'
 import authReducer from '../../store/slices/authSlice'
 import apiDefault from '../../services/api'
 
